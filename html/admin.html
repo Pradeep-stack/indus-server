@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.13.0/Sortable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Task Delegation Section -->
+        <section class="task-delegation">
+            <header>
+                <h2>Task Delegation</h2>
+            </header>
+            <ul id="todo" class="kanban-board">
+                <li class="task">Task 1</li>
+                <li class="task">Task 2</li>
+                <li class="task">Task 3</li>
+            </ul>
+        </section>
+
+        <!-- Task Progress Reporting Section -->
+        <section class="task-progress">
+            <header>
+                <h2>Task Progress Reporting</h2>
+            </header>
+            <div class="progress">
+                <div class="bar" style="width: 70%;"></div>
+                <span class="percentage">70%</span>
+            </div>
+        </section>
+
+        <!-- Application Processing Section -->
+        <section class="application-processing">
+            <header>
+                <h2>Application Processing</h2>
+            </header>
+            <ul id="done" class="kanban-board">
+                <!-- Done tasks -->
+            </ul>
+        </section>
+    </div>
+
+    <!-- <footer>
+        <p>&copy; 2024 Your Company</p>
+    </footer> -->
+
+    <script>
+        // Initialize Sortable.js for each list
+        new Sortable(document.getElementById('todo'), {
+            group: 'kanban-board',
+            animation: 150,
+            onEnd: function (evt) {
+                // Handle task movement
+                console.log('Task moved from Todo');
+                console.log(evt.item.textContent);
+            }
+        });
+
+        new Sortable(document.getElementById('done'), {
+            group: 'kanban-board',
+            animation: 150,
+            onEnd: function (evt) {
+                // Handle task movement
+                console.log('Task moved to Done');
+                console.log(evt.item.textContent);
+            }
+        });
+    </script>
+</body>
+</html>
