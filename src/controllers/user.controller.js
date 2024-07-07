@@ -540,6 +540,17 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserById = asyncHandler(async (req, res) => {
+  const userId = req.params.id; 
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res.json(new ApiResponse(200, user, "User retrieved successfully"));
+});
 export {
   registerUser,
   loginUser,
@@ -557,4 +568,5 @@ export {
   getAllParent,
   deleteUser,
   updateUser,
+  getUserById
 };

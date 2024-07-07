@@ -18,27 +18,13 @@ app.use(cookieParser())
 
 //routes import
 import userRouter from './routes/user.routes.js'
-import testimonialsRouter from "./routes/testimonial.routes.js"
 import videoRouter from "./routes/video.routes.js"
-import formRouter from "./routes/form.routes.js"
-import updateApplication from "./routes/application.routes.js"
-import parentRouter from "./routes/parentForm.route.js"
-import taskRouter from "./routes/task.routes.js"
-import columnRouter from "./routes/column.route.js"
-import { weekPerHours } from "./middlewares/createSingleObject.js";
-import settingRouter from "./routes/setting.routes.js"
-//routes declaration
-app.use(weekPerHours)
-app.use("/api/v1", userRouter)
-app.use("/api/v1", testimonialsRouter)
-app.use("/api/v1", videoRouter)
-app.use("/api/v1", formRouter)
-app.use("/api/v1", updateApplication)
-app.use("/api/v1", parentRouter)
-app.use("/api/v1/tsk", taskRouter)
-app.use("/api/v1/column", columnRouter)
-app.use("/api/v1", settingRouter)
+// import { weekPerHours } from "./middlewares/createSingleObject.js";
 
+//routes declaration
+// app.use(weekPerHours)
+app.use("/api/v1", userRouter)
+app.use("/api/v1", videoRouter)
 
 app.get('/download', (req, res) => {
     const videoUrl = req.query.url;

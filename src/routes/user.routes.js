@@ -16,6 +16,7 @@ import {
     getAllParent,
     deleteUser,
     updateUser,
+    getUserById
 } from "../controllers/user.controller.js";
 import { uploadSingle, uploadMultiple } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -30,6 +31,7 @@ router.route("/get-admin").get(getAllCenter)
 router.route("/get-user").get(getAllParent)
 router.route("/delete-user/:id").delete(deleteUser)
 router.route("/update-user/:id").patch(updateUser)
+router.route("/user-by-id/:id").get(getUserById)
 
 
 //secured routes
