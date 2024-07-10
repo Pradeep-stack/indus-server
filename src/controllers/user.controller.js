@@ -25,23 +25,29 @@ const generateAccessAndRefereshTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, password, username, refrel_code } = req.body;
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+    username,
+    refrel_code,
+    age,
+    sex,
+    profile_pic,
+    education,
+    city,
+    state,
+    country,
+  } = req.body;
 
-  // Check if a user with the given email or phone number already exists
-  const existedUser = await User.findOne({
-    $or: [{ phone }, { email }],
-  });
+  // Check if a user with the given email already exists
+  const existedUser = await User.findOne({ email });
 
   if (existedUser) {
     return res
       .status(409)
-      .json(
-        new ApiError(
-          409,
-          null,
-          "User with email or phone number already exists"
-        )
-      );
+      .json(new ApiError(409, null, "User with email already exists"));
   }
 
   // Determine user type based on the presence of the referral code
@@ -53,9 +59,16 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     email,
     phone,
-    password, // Only pass the password, not confirm_password
+    password,
     user_type,
-    refrel_code
+    refrel_code,
+    age,
+    sex,
+    profile_pic,
+    education,
+    city,
+    state,
+    country,
   });
 
   // Find the created user and exclude password and refreshToken fields
@@ -79,7 +92,6 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
-
 
 const loginUser = asyncHandler(async (req, res) => {
   // req body -> data
@@ -113,7 +125,9 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    return res.status(401).json(new ApiError(401, null, "Invalid user credentials"));
+    return res
+      .status(401)
+      .json(new ApiError(401, null, "Invalid user credentials"));
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
@@ -176,7 +190,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    return res.status(401).json(new ApiError(401, null, "unauthorized request"));    
+    return res
+      .status(401)
+      .json(new ApiError(401, null, "unauthorized request"));
   }
 
   try {
@@ -188,11 +204,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      return res.status(401).json(new ApiError(401, null, "Invalid refresh token")); 
+      return res
+        .status(401)
+        .json(new ApiError(401, null, "Invalid refresh token"));
     }
 
     if (incomingRefreshToken !== user?.refreshToken) {
-      return res.status(401).json(new ApiError(401, null, "Refresh token is expired or used")); 
+      return res
+        .status(401)
+        .json(new ApiError(401, null, "Refresh token is expired or used"));
     }
 
     const options = {
@@ -215,7 +235,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    return res.status(401).json(new ApiError(401, null, error?.message || "Invalid refresh token")); 
+    return res
+      .status(401)
+      .json(new ApiError(401, null, error?.message || "Invalid refresh token"));
   }
 });
 
@@ -226,7 +248,9 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
   if (!isPasswordCorrect) {
-    return res.status(401).json(new ApiError(400, null, "Invalid old password")); 
+    return res
+      .status(401)
+      .json(new ApiError(400, null, "Invalid old password"));
   }
 
   user.password = newPassword;
@@ -548,7 +572,7 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const getUserById = asyncHandler(async (req, res) => {
-  const userId = req.params.id; 
+  const userId = req.params.id;
 
   const user = await User.findById(userId);
 
@@ -575,5 +599,5 @@ export {
   getAllParent,
   deleteUser,
   updateUser,
-  getUserById
+  getUserById,
 };
