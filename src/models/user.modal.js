@@ -63,6 +63,9 @@ const userSchema = new Schema(
             type: String,
             required: [true, 'Password is required']
         },
+        refrel_code: {
+            type: String,
+        },
         refreshToken: {
             type: String
         }

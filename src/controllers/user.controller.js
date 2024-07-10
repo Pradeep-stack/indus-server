@@ -25,15 +25,16 @@ const generateAccessAndRefereshTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, email, phone, password, user_type, username } = req.body;
+  const { fullName, email, phone, password, username, refrel_code } = req.body;
 
+  // Check if a user with the given email or phone number already exists
   const existedUser = await User.findOne({
     $or: [{ phone }, { email }],
   });
 
   if (existedUser) {
     return res
-      .status(500)
+      .status(409)
       .json(
         new ApiError(
           409,
@@ -41,9 +42,12 @@ const registerUser = asyncHandler(async (req, res) => {
           "User with email or phone number already exists"
         )
       );
-    // throw new ApiError(409, "User with email or phone number already exists");
   }
 
+  // Determine user type based on the presence of the referral code
+  let user_type = refrel_code ? "Admin" : "User";
+
+  // Create a new user with the determined user type
   const user = await User.create({
     username,
     fullName,
@@ -51,8 +55,10 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password, // Only pass the password, not confirm_password
     user_type,
+    refrel_code
   });
 
+  // Find the created user and exclude password and refreshToken fields
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -73,6 +79,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
+
 
 const loginUser = asyncHandler(async (req, res) => {
   // req body -> data
