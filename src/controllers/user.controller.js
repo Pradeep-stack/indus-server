@@ -31,7 +31,7 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password,
     username,
-    refrel_code,
+    referral_code,
     age,
     sex,
     profile_pic,
@@ -42,26 +42,26 @@ const registerUser = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Check if a user with the given email already exists
-  const existedUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email });
 
-  if (existedUser) {
+  if (existingUser) {
     return res
       .status(409)
-      .json(new ApiError(409, null, "User with email already exists"));
+      .json(new ApiError(409, "User with email already exists"));
   }
 
   // Determine user type based on the presence of the referral code
-  let user_type = refrel_code ? "Admin" : "User";
+  const user_type = referral_code ? "Admin" : "User";
 
   // Create a new user with the determined user type
-  const user = await User.create({
+  const user = new User({
     username,
     fullName,
     email,
     phone,
     password,
     user_type,
-    refrel_code,
+    referral_code,
     age,
     sex,
     profile_pic,
@@ -71,6 +71,9 @@ const registerUser = asyncHandler(async (req, res) => {
     country,
   });
 
+  // Save the user to the database
+  await user.save();
+
   // Find the created user and exclude password and refreshToken fields
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -79,18 +82,12 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!createdUser) {
     return res
       .status(500)
-      .json(
-        new ApiError(
-          500,
-          null,
-          "Something went wrong while registering the user"
-        )
-      );
+      .json(new ApiError(500, "Something went wrong while registering the user"));
   }
 
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered successfully"));
+    .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
