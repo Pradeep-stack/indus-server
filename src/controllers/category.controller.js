@@ -24,6 +24,18 @@ export const getCategory = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiResponse(400, null, error.message));
   }
 });
+
+// Get packages by region
+export const getCategoryByRegion = async (req, res) => {
+  try {
+    const { region } = req.params;
+    const category = await Category.find({ region });
+    if (!category.length) return res.status(404).json({ message: "No Category found in this region" });
+    res.status(200).json(category);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 export const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

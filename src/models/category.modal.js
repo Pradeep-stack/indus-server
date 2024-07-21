@@ -9,13 +9,16 @@ const categorySchem = new Schema(
     description: {
       type: String,
     },
-    image:{
-      type:String
-    }
+    image: {
+      type: String,
+    },
+    region: {
+      enum: ["india", "nepal"],
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export const Category = mongoose.model("Category", categorySchem)
+export const Category = mongoose.model("Category", categorySchem);

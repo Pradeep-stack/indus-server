@@ -68,7 +68,10 @@ const userSchema = new Schema(
         },
         refreshToken: {
             type: String
-        }
+        },
+        region:{
+            enum:["india", "nepal"]
+          }
 
     },
     {

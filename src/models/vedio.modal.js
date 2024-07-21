@@ -13,6 +13,9 @@ const videoSchema = new Schema(
     description: {
       type: String,
     },
+    region: {
+      enum: ["india", "nepal"],
+    },
   },
   {
     timestamps: true,

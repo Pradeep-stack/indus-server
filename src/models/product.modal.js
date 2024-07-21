@@ -25,6 +25,17 @@ const productSchema = new Schema(
     description: {
       type: String,
     },
+    associateDiscount:{
+      type: Number,
+      default: 0
+    },
+    userDiscount:{
+      type: Number,
+      default: 0
+    },
+    region:{
+      enum:["india", "nepal"]
+    }
   },
   {
     timestamps: true,

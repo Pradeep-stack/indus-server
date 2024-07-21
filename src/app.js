@@ -21,6 +21,7 @@ import userRouter from './routes/user.routes.js'
 import videoRouter from "./routes/video.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import productRouter from "./routes/product.route.js"
+import packagesRoutes from "./routes/packages.routes.js"
 // import { weekPerHours } from "./middlewares/createSingleObject.js";
 
 //routes declaration
@@ -29,6 +30,7 @@ app.use("/api/v1", userRouter)
 app.use("/api/v1", videoRouter)
 app.use("/api/v1", categoryRouter)
 app.use("/api/v1", productRouter)
+app.use("/api/v1/packages", packagesRoutes);
 
 app.get('/download', (req, res) => {
     const videoUrl = req.query.url;
