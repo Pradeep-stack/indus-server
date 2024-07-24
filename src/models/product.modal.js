@@ -34,7 +34,9 @@ const productSchema = new Schema(
       default: 0
     },
     region:{
-      enum:["india", "nepal"]
+      type: String,
+      enum:["india", "nepal"],
+      required: true
     }
   },
   {

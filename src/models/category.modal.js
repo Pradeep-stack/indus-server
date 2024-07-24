@@ -12,9 +12,11 @@ const categorySchem = new Schema(
     image: {
       type: String,
     },
-    region: {
-      enum: ["india", "nepal"],
-    },
+    region:{
+      type: String,
+      enum:["india", "nepal"],
+      required: true
+    }
   },
   {
     timestamps: true,

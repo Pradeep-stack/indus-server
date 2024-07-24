@@ -4,6 +4,8 @@ import cors from "cors"
 import path from 'path';
 import { __dirname } from './utils/dirname.js';
 import ytdl from 'ytdl-core';
+import AWS from "aws-sdk"
+import multer from "multer"
 const app = express()
 
 app.use(cors({
@@ -22,6 +24,7 @@ import videoRouter from "./routes/video.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import productRouter from "./routes/product.route.js"
 import packagesRoutes from "./routes/packages.routes.js"
+import { upload, uploadToS3 } from './utils/awsImageUpload.js';
 // import { weekPerHours } from "./middlewares/createSingleObject.js";
 
 //routes declaration
@@ -32,6 +35,10 @@ app.use("/api/v1", categoryRouter)
 app.use("/api/v1", productRouter)
 app.use("/api/v1/packages", packagesRoutes);
 
+//multer setup
+app.post('/upload', upload.single('image'), uploadToS3);
+
+// youtube video download
 app.get('/download', (req, res) => {
     const videoUrl = req.query.url;
     

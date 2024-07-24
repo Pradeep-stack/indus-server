@@ -39,6 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
     city,
     state,
     country,
+    region
   } = req.body;
 
   // Check if a user with the given email already exists
@@ -69,6 +70,7 @@ const registerUser = asyncHandler(async (req, res) => {
     city,
     state,
     country,
+    region
   });
 
   // Save the user to the database

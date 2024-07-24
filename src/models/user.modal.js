@@ -61,16 +61,18 @@ const userSchema = new Schema(
         },
         password: {
             type: String,
-            required: [true, 'Password is required']
+            required: true
         },
-        refrel_code: {
+        referral_code: {
             type: String,
         },
         refreshToken: {
             type: String
         },
         region:{
-            enum:["india", "nepal"]
+            type: String,
+            enum:["india", "nepal"],
+            required: true
           }
 
     },

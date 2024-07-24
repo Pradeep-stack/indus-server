@@ -39,10 +39,11 @@ const packagesSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    region: {
+    region:{
       type: String,
-      enum: ["india", "nepal"],
-    },
+      enum:["india", "nepal"],
+      required: true
+    }
   },
   {
     timestamps: true,
