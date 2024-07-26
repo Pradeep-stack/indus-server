@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { nanoid } from 'nanoid';
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -31,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password,
     username,
-    referral_code,
+    referredBy,
     age,
     sex,
     profile_pic,
@@ -42,7 +43,6 @@ const registerUser = asyncHandler(async (req, res) => {
     region
   } = req.body;
 
-  // Check if a user with the given email already exists
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -51,10 +51,10 @@ const registerUser = asyncHandler(async (req, res) => {
       .json(new ApiError(409, "User with email already exists"));
   }
 
-  // Determine user type based on the presence of the referral code
-  const user_type = referral_code ? "Admin" : "User";
+  const newReferralCode = nanoid(6);
 
-  // Create a new user with the determined user type
+  const user_type = referredBy ? "Admin" : "User";
+
   const user = new User({
     username,
     fullName,
@@ -62,7 +62,8 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password,
     user_type,
-    referral_code,
+    referral_code: newReferralCode, 
+    referredBy: referredBy,     
     age,
     sex,
     profile_pic,
@@ -73,10 +74,16 @@ const registerUser = asyncHandler(async (req, res) => {
     region
   });
 
-  // Save the user to the database
+  if (referredBy) {
+    const referringUser = await User.findOne({ referral_code: referredBy });
+    if (referringUser) {
+      referringUser.points += 250; 
+      await referringUser.save();
+    }
+  }
+
   await user.save();
 
-  // Find the created user and exclude password and refreshToken fields
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -91,6 +98,8 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
+
+
 
 const loginUser = asyncHandler(async (req, res) => {
   // req body -> data

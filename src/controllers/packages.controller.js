@@ -31,7 +31,18 @@ export const getPackageById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+ //Get package by user id
 
+ export const getPlanByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const plan = await Packages.findOne({ userId });
+    if (!plan) return res.status(404).json({ message: "Package not found" });
+    res.status(200).json(plan);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // Get packages by region
 export const getPackagesByRegion = async (req, res) => {
     try {
