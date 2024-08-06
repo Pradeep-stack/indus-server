@@ -25,6 +25,8 @@ const generateAccessAndRefereshTokens = async (userId) => {
   }
 };
 
+
+
 const registerUser = asyncHandler(async (req, res) => {
   const {
     fullName,
@@ -532,9 +534,24 @@ const deleteUser = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
-const updateUser = asyncHandler(async (req, res) => {
+const updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id; // Assuming you pass the user ID in the URL params
-  const { fullName, email, phone, user_type, username } = req.body;
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+    username,
+    referredBy,
+    age,
+    sex,
+    profile_pic,
+    education,
+    city,
+    state,
+    country,
+    region,
+  } = req.body;
 
   try {
     let user = await User.findById(userId);
@@ -563,8 +580,17 @@ const updateUser = asyncHandler(async (req, res) => {
     user.fullName = fullName || user.fullName;
     user.email = email || user.email;
     user.phone = phone || user.phone;
-    user.user_type = user_type || user.user_type;
+    user.password = password || user.password;
     user.username = username || user.username;
+    user.referredBy = referredBy || user.referredBy;
+    user.age = age || user.age;
+    user.sex = sex || user.sex;
+    user.profile_pic = profile_pic || user.profile_pic;
+    user.education = education || user.education;
+    user.city = city || user.city;
+    user.state = state || user.state;
+    user.country = country || user.country;
+    user.region = region || user.region;
 
     // Save updated user
     user = await user.save();
@@ -578,6 +604,7 @@ const updateUser = asyncHandler(async (req, res) => {
     return next(error);
   }
 });
+
 
 const getUserById = asyncHandler(async (req, res) => {
   const userId = req.params.id;

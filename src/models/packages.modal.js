@@ -43,6 +43,10 @@ const packagesSchema = new Schema(
       type: String,
       enum:["india", "nepal"],
       required: true
+    },
+    status: {
+      type:Boolean,
+      default: false,
     }
   },
   {

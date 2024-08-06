@@ -31,34 +31,40 @@ export const getPackageById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
- //Get package by user id
+//Get package by user id
 
- export const getPlanByUserId = async (req, res) => {
+export const getPlanByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
     const plan = await Packages.findOne({ userId });
+    const response = await plan.populate("userId");
     if (!plan) return res.status(404).json({ message: "Package not found" });
-    res.status(200).json(plan);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 // Get packages by region
 export const getPackagesByRegion = async (req, res) => {
-    try {
-      const { region } = req.params;
-      const packages = await Packages.find({ region });
-      if (!packages.length) return res.status(404).json({ message: "No packages found in this region" });
-      res.status(200).json(packages);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  };
+  try {
+    const { region } = req.params;
+    const packages = await Packages.find({ region });
+    if (!packages.length)
+      return res
+        .status(404)
+        .json({ message: "No packages found in this region" });
+    res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Update a package
 export const updatePackage = async (req, res) => {
   try {
-    const plan = await Packages.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const plan = await Packages.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!plan) return res.status(404).json({ message: "Package not found" });
     res.status(200).json(plan);
   } catch (error) {
