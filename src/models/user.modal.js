@@ -31,7 +31,7 @@ const userSchema = new Schema(
       enum: ["Male", "Female", "Other"],
       // required: true,
     },
-    profile_pic: {
+    image: {
       type: String,
       // required: true,
     },

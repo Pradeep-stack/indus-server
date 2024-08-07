@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
     referredBy,
     age,
     sex,
-    profile_pic,
+    image ,
     education,
     city,
     state,
@@ -68,7 +68,7 @@ const registerUser = asyncHandler(async (req, res) => {
     referredBy: referredBy,     
     age,
     sex,
-    profile_pic,
+    image ,
     education,
     city,
     state,
@@ -545,7 +545,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
     referredBy,
     age,
     sex,
-    profile_pic,
+    image ,
     education,
     city,
     state,
@@ -585,7 +585,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
     user.referredBy = referredBy || user.referredBy;
     user.age = age || user.age;
     user.sex = sex || user.sex;
-    user.profile_pic = profile_pic || user.profile_pic;
+    user.image  = image  || user.image ;
     user.education = education || user.education;
     user.city = city || user.city;
     user.state = state || user.state;
