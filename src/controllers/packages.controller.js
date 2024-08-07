@@ -25,8 +25,9 @@ export const getAllPackages = async (req, res) => {
 export const getPackageById = async (req, res) => {
   try {
     const plan = await Packages.findById(req.params.id);
+    const response = await plan.populate("userId");
     if (!plan) return res.status(404).json({ message: "Package not found" });
-    res.status(200).json(plan);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

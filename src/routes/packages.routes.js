@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/add", createPackage);
 router.get("/get-all", getAllPackages);
 router.get("/get-by-region/:region", getPackagesByRegion);
-router.get("/gey-by-id/:id", getPackageById);
+router.get("/get-by-id/:id", getPackageById);
 router.patch("/update/:id", updatePackage);
 router.delete("/delete/:id", deletePackage);
 router.get('/get/:userId', getPlanByUserId);
