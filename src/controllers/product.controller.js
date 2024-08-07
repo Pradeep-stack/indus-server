@@ -105,3 +105,21 @@ export const getAllPurchases = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
+
+// Update Purchase by Purchase ID
+export const updatePurches  = asyncHandler(async (req, res) => {
+  const { purchaseId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const purchase = await Purchase.findByIdAndUpdate(purchaseId, updateData, { new: true }).populate('productId');
+
+    if (!purchase) {
+      return res.status(404).json(new ApiResponse(404, null, "Purchase not found"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, purchase, "Purchase updated successfully"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
+  }
+});
