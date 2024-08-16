@@ -2,6 +2,7 @@ import { Product } from "../models/product.modal.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Purchase } from "../models/purchase.model.js";
+
 export const addProduct = asyncHandler(async (req, res) => {
   const data = req.body;
   try {
@@ -11,6 +12,24 @@ export const addProduct = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, product, "product Addedd Successfully..!"));
   } catch (error) {
     return res.status(500).json(new ApiResponse(400, null, error.message));
+  }
+});
+
+// update product 
+export const editProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params; 
+  const data = req.body;
+  
+  try {
+    const product = await Product.findByIdAndUpdate(id, data, { new: true }); 
+    if (!product) {
+      return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, product, "Product Updated Successfully..!"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 
@@ -36,6 +55,8 @@ export const getProductByRegion = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// deleteProduct 
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

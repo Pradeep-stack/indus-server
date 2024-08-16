@@ -24,6 +24,7 @@ export const getVideo = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiResponse(400, null, error.message));
   }
 });
+
 export const deleteVideo = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

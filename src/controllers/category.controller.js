@@ -36,6 +36,7 @@ export const getCategoryByRegion = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -55,5 +56,24 @@ export const deleteCategory = asyncHandler(async (req, res) => {
       return res.status(500).json(
           new ApiResponse(500, null, error.message)
       );
+  }
+});
+
+// for the update 
+
+export const editCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params; 
+  const data = req.body;
+  
+  try {
+    const category = await Category.findByIdAndUpdate(id, data, { new: true }); 
+    if (!category) {
+      return res.status(404).json(new ApiResponse(404, null, "Category not found"));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(200, category, "Category Updated Successfully..!"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });

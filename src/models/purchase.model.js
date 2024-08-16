@@ -19,8 +19,9 @@ const PurchaseSchema = new Schema({
     default: Date.now
   },
   status: {
-    type:Boolean,
-    default: false,
+    type: String,
+    enum: ["Pending", "Reject", "Approve"],
+    default: "Pending"
   }
 
 });

@@ -26,7 +26,6 @@ const generateAccessAndRefereshTokens = async (userId) => {
 };
 
 
-
 const registerUser = asyncHandler(async (req, res) => {
   const {
     fullName,
@@ -79,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (referredBy) {
     const referringUser = await User.findOne({ referral_code: referredBy });
     if (referringUser) {
-      referringUser.points += 250; 
+      // referringUser.points += 250; 
       await referringUser.save();
     }
   }
@@ -248,6 +247,22 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     return res
       .status(401)
       .json(new ApiError(401, null, error?.message || "Invalid refresh token"));
+  }
+});
+
+export const getUsersReferredByMe = asyncHandler(async (req, res) => {
+  const { referral_code } = req.params; 
+  
+  try {
+    const users = await User.find({ referredBy: referral_code });
+    
+    if (!users.length) {
+      return res.status(404).json(new ApiResponse(404, null, "No users found referred by this code"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, users, "Users retrieved successfully"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 

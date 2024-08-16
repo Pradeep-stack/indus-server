@@ -8,7 +8,11 @@ const orderSchema = new Schema({
   },
   quantity: { type: Number, required: true },
   totalPrice: { type: Number, required: true },
-  status: { type: String, default: "Pending" },
+  status: {
+    type: String,
+    enum: ["Pending", "Reject", "Approve"],
+    default: "Pending"
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

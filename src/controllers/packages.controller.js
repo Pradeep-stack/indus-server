@@ -1,10 +1,39 @@
 import { Packages } from "../models/packages.modal.js";
-
+import { User } from "../models/user.modal.js";
 // Create a new package
 export const createPackage = async (req, res) => {
   try {
     const newPackage = new Packages(req.body);
     await newPackage.save();
+
+    const { userId, referredBy, packagePlan, workingArea } = newPackage;
+    const userType = "Admin";
+
+    if (userId) {
+      const user = await User.findById(userId);
+      if (user) {
+        user.user_type = userType;
+        await user.save();
+      }
+    }
+
+    if (referredBy) {
+      const referringUser = await User.findOne({ referral_code: referredBy });
+      if (referringUser) {
+        if (packagePlan === "package-1") {
+          referringUser.points += workingArea * 0.1;
+          await referringUser.save();
+        } else if (packagePlan === "package-2") {
+          referringUser.points += workingArea * 0.2;
+          await referringUser.save();
+        } else if (packagePlan === "package-3") {
+          referringUser.points += workingArea * 0.4;
+          await referringUser.save();
+        }
+      }else{
+        console.log(`Referral code ${referredBy} not found.`);
+      }
+    }
     res.status(201).json(newPackage);
   } catch (error) {
     res.status(400).json({ message: error.message });
