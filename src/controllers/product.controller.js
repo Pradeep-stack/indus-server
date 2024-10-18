@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Purchase } from "../models/purchase.model.js";
 import { User } from "../models/user.modal.js";
+import { Packages } from "../models/packages.modal.js";
 export const addProduct = asyncHandler(async (req, res) => {
   const data = req.body;
   try {
@@ -106,7 +107,7 @@ export const buyProduct = asyncHandler(async (req, res) => {
   const { productId, quantity, userId } = req.body;
 
   try {
-    const product = await Product.findById(productId);
+    const product = await Packages.findById(productId);
 
     if (!product) {
       return res
@@ -134,12 +135,12 @@ export const buyProduct = asyncHandler(async (req, res) => {
       if (referringUser) {
         // Add commission to the referring user
         let commission;
-        if (product.price == 15) {
-          commission = product.price * 0.1;
-        } else if (product.price == 50) {
-          commission = product.price * 0.2;
-        } else if (product.price == 150) {
-          commission = product.price * 0.4;
+        if (product.workingArea == 15) {
+          commission =parseInt(product.workingArea)  * 0.1;
+        } else if (product.workingArea == 50) {
+          commission = parseInt(product.workingArea) * 0.2;
+        } else if (product.workingArea == 150) {
+          commission = parseInt(product.workingArea) * 0.4;
         }
         // Assuming 10% commission
         referringUser.points += commission; // Assuming points are being used for commission
