@@ -3,34 +3,59 @@ import { User } from "../models/user.modal.js";
 // Create a new package
 export const createPackage = async (req, res) => {
   try {
-    const newPackage = new Packages(req.body);
+    const {
+      userId,
+      plan,
+      benefits,
+      subscription,
+      lifetime,
+      renewable,
+      workingArea,
+      overseas,
+      region,
+      packagePlan,
+      referredBy,
+    } = req.body;
+
+    const newPackage = new Packages({
+      userId: userId,
+      plan: plan,
+      benefits: benefits,
+      subscription: subscription,
+      lifetime: lifetime,
+      renewable: renewable,
+      workingArea: workingArea,
+      overseas: overseas,
+      region: region,
+      packagePlan: packagePlan,
+      referredBy: referredBy,
+    });
     await newPackage.save();
 
-    const { userId, referredBy, packagePlan, workingArea } = newPackage;
     const userType = "Admin";
 
-    if (userId) {
-      const user = await User.findById(userId);
-      if (user) {
-        user.user_type = userType;
-        await user.save();
-      }
+    const user = await User.findById(userId);
+    if (user) {
+      user.user_type = userType;
+      await user.save();
     }
 
     if (referredBy) {
-      const referringUser = await User.findOne({ referral_code: referredBy });
+      const referringUser = await User.findOne({
+        referral_code: referredBy,
+      });
       if (referringUser) {
-        if (packagePlan === "package-1") {
+        if (packagePlan == "package-1") {
           referringUser.points += parseInt(workingArea) * 0.1;
           await referringUser.save();
-        } else if (packagePlan === "package-2") {
-          referringUser.points +=parseInt(workingArea) * 0.2;
+        } else if (packagePlan == "package-2") {
+          referringUser.points += parseInt(workingArea) * 0.2;
           await referringUser.save();
-        } else if (packagePlan === "package-3") {
+        } else if (packagePlan == "package-3") {
           referringUser.points += parseInt(workingArea) * 0.4;
           await referringUser.save();
         }
-      }else{
+      } else {
         console.log(`Referral code ${referredBy} not found.`);
       }
     }
