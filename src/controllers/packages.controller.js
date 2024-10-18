@@ -21,13 +21,13 @@ export const createPackage = async (req, res) => {
       const referringUser = await User.findOne({ referral_code: referredBy });
       if (referringUser) {
         if (packagePlan === "package-1") {
-          referringUser.points += workingArea * 0.1;
+          referringUser.points += parseInt(workingArea) * 0.1;
           await referringUser.save();
         } else if (packagePlan === "package-2") {
-          referringUser.points += workingArea * 0.2;
+          referringUser.points +=parseInt(workingArea) * 0.2;
           await referringUser.save();
         } else if (packagePlan === "package-3") {
-          referringUser.points += workingArea * 0.4;
+          referringUser.points += parseInt(workingArea) * 0.4;
           await referringUser.save();
         }
       }else{
