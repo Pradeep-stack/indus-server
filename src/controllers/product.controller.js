@@ -2,7 +2,7 @@ import { Product } from "../models/product.modal.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Purchase } from "../models/purchase.model.js";
-
+import { User } from "../models/user.modal.js";
 export const addProduct = asyncHandler(async (req, res) => {
   const data = req.body;
   try {
@@ -15,15 +15,17 @@ export const addProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// update product 
+// update product
 export const editProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params; 
+  const { id } = req.params;
   const data = req.body;
-  
+
   try {
-    const product = await Product.findByIdAndUpdate(id, data, { new: true }); 
+    const product = await Product.findByIdAndUpdate(id, data, { new: true });
     if (!product) {
-      return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Product not found"));
     }
     return res
       .status(200)
@@ -49,37 +51,57 @@ export const getProductByRegion = async (req, res) => {
   try {
     const { region } = req.params;
     const product = await Product.find({ region });
-    if (!product.length) return res.status(404).json({ message: "No Product found in this region" });
+    if (!product.length)
+      return res
+        .status(404)
+        .json({ message: "No Product found in this region" });
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// deleteProduct 
+// deleteProduct
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   try {
-      const deleteVideo = await Product.findByIdAndDelete(id);
+    const deleteVideo = await Product.findByIdAndDelete(id);
 
-      if (!deleteVideo) {
-          return res.status(404).json(
-              new ApiResponse(404, null, "product not found")
-          );
-      }
+    if (!deleteVideo) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "product not found"));
+    }
 
-      return res.status(200).json(
-          new ApiResponse(200, {}, "product deleted successfully")
-      );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "product deleted successfully"));
   } catch (error) {
-      return res.status(500).json(
-          new ApiResponse(500, null, error.message)
-      );
+    return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 
 // Buy Product Function
+// export const buyProduct = asyncHandler(async (req, res) => {
+//   const { productId, quantity, userId } = req.body;
+
+//   try {
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+//     }
+
+//     // Create the purchase record
+//     const purchase = await Purchase.create({ productId: productId, quantity: quantity, userId: userId });
+
+//     return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
+//   } catch (error) {
+//     return res.status(500).json(new ApiResponse(500, null, error.message));
+//   }
+// });
+
 export const buyProduct = asyncHandler(async (req, res) => {
   const { productId, quantity, userId } = req.body;
 
@@ -87,13 +109,47 @@ export const buyProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Product not found"));
     }
 
     // Create the purchase record
-    const purchase = await Purchase.create({ productId: productId, quantity: quantity, userId: userId });
+    const purchase = await Purchase.create({
+      productId: productId,
+      quantity: quantity,
+      userId: userId,
+    });
 
-    return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
+    console.log("purchase", purchase);
+    // Fetch the user who made the purchase
+    const user = await User.findById(userId);
+
+    if (user.referredBy) {
+      // Find the referring user
+      const referringUser = await User.findOne({
+        referral_code: user.referredBy,
+      });
+
+      if (referringUser) {
+        // Add commission to the referring user
+        let commission;
+        if (product.price == 15) {
+          commission = product.price * 0.1;
+        } else if (product.price == 50) {
+          commission = product.price * 0.2;
+        } else if (product.price == 150) {
+          commission = product.price * 0.4;
+        }
+        // Assuming 10% commission
+        referringUser.points += commission; // Assuming points are being used for commission
+        await referringUser.save();
+      }
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, purchase, "Product purchased successfully"));
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
@@ -104,13 +160,21 @@ export const getPurchasesByUserId = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const purchases = await Purchase.find({ userId: userId }).populate('productId');
+    const purchases = await Purchase.find({ userId: userId }).populate(
+      "productId"
+    );
 
     if (!purchases.length) {
-      return res.status(404).json(new ApiResponse(404, null, "No purchases found for this user"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "No purchases found for this user"));
     }
 
-    return res.status(200).json(new ApiResponse(200, purchases, "Purchases retrieved successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, purchases, "Purchases retrieved successfully")
+      );
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
@@ -119,27 +183,39 @@ export const getPurchasesByUserId = asyncHandler(async (req, res) => {
 // Get All Purchased Products
 export const getAllPurchases = asyncHandler(async (req, res) => {
   try {
-    const purchases = await Purchase.find().populate('productId').populate('userId');
+    const purchases = await Purchase.find()
+      .populate("productId")
+      .populate("userId");
 
-    return res.status(200).json(new ApiResponse(200, purchases, "All purchases retrieved successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, purchases, "All purchases retrieved successfully")
+      );
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
 });
 
 // Update Purchase by Purchase ID
-export const updatePurches  = asyncHandler(async (req, res) => {
+export const updatePurches = asyncHandler(async (req, res) => {
   const { purchaseId } = req.params;
   const updateData = req.body;
 
   try {
-    const purchase = await Purchase.findByIdAndUpdate(purchaseId, updateData, { new: true }).populate('productId');
+    const purchase = await Purchase.findByIdAndUpdate(purchaseId, updateData, {
+      new: true,
+    }).populate("productId");
 
     if (!purchase) {
-      return res.status(404).json(new ApiResponse(404, null, "Purchase not found"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Purchase not found"));
     }
 
-    return res.status(200).json(new ApiResponse(200, purchase, "Purchase updated successfully"));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, purchase, "Purchase updated successfully"));
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }

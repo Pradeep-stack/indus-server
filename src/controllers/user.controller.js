@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { nanoid } from 'nanoid';
+import { nanoid } from "nanoid";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -25,7 +25,6 @@ const generateAccessAndRefereshTokens = async (userId) => {
   }
 };
 
-
 const registerUser = asyncHandler(async (req, res) => {
   const {
     fullName,
@@ -36,12 +35,12 @@ const registerUser = asyncHandler(async (req, res) => {
     referredBy,
     age,
     sex,
-    image ,
+    image,
     education,
     city,
     state,
     country,
-    region
+    region,
   } = req.body;
 
   const existingUser = await User.findOne({ email });
@@ -63,22 +62,22 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     password,
     user_type,
-    referral_code: newReferralCode, 
-    referredBy: referredBy,     
+    referral_code: newReferralCode,
+    referredBy: referredBy,
     age,
     sex,
-    image ,
+    image,
     education,
     city,
     state,
     country,
-    region
+    region,
   });
 
   if (referredBy) {
     const referringUser = await User.findOne({ referral_code: referredBy });
     if (referringUser) {
-      // referringUser.points += 250; 
+      // referringUser.points += 250;
       await referringUser.save();
     }
   }
@@ -92,15 +91,15 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!createdUser) {
     return res
       .status(500)
-      .json(new ApiError(500, "Something went wrong while registering the user"));
+      .json(
+        new ApiError(500, "Something went wrong while registering the user")
+      );
   }
 
   return res
     .status(201)
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
-
-
 
 const loginUser = asyncHandler(async (req, res) => {
   // req body -> data
@@ -251,16 +250,22 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 export const getUsersReferredByMe = asyncHandler(async (req, res) => {
-  const { referral_code } = req.params; 
-  
+  const { referral_code } = req.params;
+
   try {
     const users = await User.find({ referredBy: referral_code });
-    
+
     if (!users.length) {
-      return res.status(404).json(new ApiResponse(404, null, "No users found referred by this code"));
+      return res
+        .status(404)
+        .json(
+          new ApiResponse(404, null, "No users found referred by this code")
+        );
     }
 
-    return res.status(200).json(new ApiResponse(200, users, "Users retrieved successfully"));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, users, "Users retrieved successfully"));
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }
@@ -560,7 +565,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
     referredBy,
     age,
     sex,
-    image ,
+    image,
     education,
     city,
     state,
@@ -600,7 +605,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
     user.referredBy = referredBy || user.referredBy;
     user.age = age || user.age;
     user.sex = sex || user.sex;
-    user.image  = image  || user.image ;
+    user.image = image || user.image;
     user.education = education || user.education;
     user.city = city || user.city;
     user.state = state || user.state;
@@ -619,7 +624,6 @@ const updateUser = asyncHandler(async (req, res, next) => {
     return next(error);
   }
 });
-
 
 const getUserById = asyncHandler(async (req, res) => {
   const userId = req.params.id;
