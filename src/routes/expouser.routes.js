@@ -9,7 +9,7 @@ import {
 const router = Router()
 
 router.route("/register").post(registerExpoUser )
-router.route("/get-all-user").get(getAllExpoUsers)
-router.route("/user-by-id/:id").get(getUserById)
+router.route("/allusers").get(getAllExpoUsers)
+router.route("/user/:id").get(getUserById)
 
 export default router

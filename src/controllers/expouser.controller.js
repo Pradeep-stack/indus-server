@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
-import { ExpoUser } from "../models/user.modal.js";
+import { ExpoUser } from "../models/expouser.modal.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
@@ -87,4 +87,4 @@ const getUserById = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, user, "User retrieved successfully"));
 });
-export { registerExpoUser, getAllUsers, getUserById };
+export { registerExpoUser, getAllExpoUsers, getUserById };

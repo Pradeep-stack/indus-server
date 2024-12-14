@@ -25,6 +25,7 @@ import categoryRouter from "./routes/category.routes.js"
 import productRouter from "./routes/product.route.js"
 import packagesRoutes from "./routes/packages.routes.js"
 import { upload, uploadToS3 } from './utils/awsImageUpload.js';
+import exposuerRouter from "./routes/expouser.routes.js"
 // import { weekPerHours } from "./middlewares/createSingleObject.js";
 
 //routes declaration
@@ -34,6 +35,7 @@ app.use("/api/v1", videoRouter)
 app.use("/api/v1", categoryRouter)
 app.use("/api/v1", productRouter)
 app.use("/api/v1/packages", packagesRoutes);
+app.use("/api/v1/expo", exposuerRouter)
 
 //multer setup
 app.post('/upload', upload.single('image'), uploadToS3);
