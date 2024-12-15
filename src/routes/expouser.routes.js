@@ -10,6 +10,6 @@ const router = Router()
 
 router.route("/register").post(registerExpoUser )
 router.route("/allusers").get(getAllExpoUsers)
-router.route("/user/:id").get(getUserById)
+router.route("/get-user/:id").get(getUserById)
 
 export default router
