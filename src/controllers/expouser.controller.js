@@ -77,9 +77,9 @@ const getAllExpoUsers = asyncHandler(async (req, res) => {
 
 
 const getUserById = asyncHandler(async (req, res) => {
-  const userId = req.params.id;
+  const id = req.params.id;
 
-  const user = await ExpoUser.findById(userId);
+  const user = await ExpoUser.findOne({id});
 
   if (!user) {
     throw new ApiError(404, "User not found");
