@@ -20,35 +20,34 @@ const generateUniqueId = async () => {
 
 
   const registerExpoUser = asyncHandler(async (req, res) => {
-    const { name, email, phone, city } = req.body;
+    const { name, company, phone, city } = req.body;
   
-    if (!name || !email || !phone || !city) {
+    if (!name || !company || !phone || !city) {
       return res
         .status(400)
-        .json(new ApiError(400, "All fields (name, email, phone, city) are required"));
+        .json(new ApiError(400, "All fields (name, company, phone, city) are required"));
     }
   
     try {
+      const id = await generateUniqueId();
 
-     let id = await generateUniqueId();
-      const existingUser = await ExpoUser.findOne({ email });
+      const existingUser = await ExpoUser.findOne({ phone });
   
       if (existingUser) {
         return res
-          .status(409)
-          .json(new ApiError(409, "User with this email already exists"));
+          .status(400)
+          .json({ status: 400, message: "Phone number already exists" });
       }
   
-      // Create a new user
       const newUser = new ExpoUser({
         id,
         name,
-        email,
+        company,
         phone,
         city,
       });
   
-      // Save user to the database
+      // Save the user to the database
       const createdUser = await newUser.save();
   
       // Return success response
@@ -56,13 +55,17 @@ const generateUniqueId = async () => {
         .status(201)
         .json(new ApiResponse(201, createdUser, "User registered successfully"));
     } catch (error) {
-      // Handle unexpected errors
+      // Log the error for debugging
+      console.error("Error registering user:", error);
+  
+      // Return a generic error response
       return res
         .status(500)
         .json(new ApiError(500, "Internal server error"));
     }
   });
-  ;
+  
+  
 
 const getAllExpoUsers = asyncHandler(async (req, res) => {
   const users = await ExpoUser.find();
@@ -77,12 +80,14 @@ const getAllExpoUsers = asyncHandler(async (req, res) => {
 
 
 const getUserById = asyncHandler(async (req, res) => {
-  const id = req.params.id;
+  const phone = req.params.phone;
 
-  const user = await ExpoUser.findOne({id});
+  const user = await ExpoUser.findOne({phone});
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    return res
+        .status(400)
+        .json(new ApiError(400, "User not found"));
   }
 
   return res.json(new ApiResponse(200, user, "User retrieved successfully"));

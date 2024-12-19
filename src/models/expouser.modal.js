@@ -7,7 +7,7 @@ const expoUserSchema = new Schema(
       type: String,
       required: true,
     },
-    email: {
+    company: {
       type: String,
       required: true,
     },
