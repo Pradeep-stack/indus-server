@@ -20,7 +20,7 @@ const generateUniqueId = async () => {
 
 
   const registerExpoUser = asyncHandler(async (req, res) => {
-    const { name, company, phone, city } = req.body;
+    const { name, company, phone, city, profile_pic } = req.body;
   
     if (!name || !company || !phone || !city ||!profile_pic) {
       return res
