@@ -22,7 +22,7 @@ const generateUniqueId = async () => {
   const registerExpoUser = asyncHandler(async (req, res) => {
     const { name, company, phone, city } = req.body;
   
-    if (!name || !company || !phone || !city) {
+    if (!name || !company || !phone || !city ||!profile_pic) {
       return res
         .status(400)
         .json(new ApiError(400, "All fields (name, company, phone, city) are required"));
@@ -45,6 +45,7 @@ const generateUniqueId = async () => {
         company,
         phone,
         city,
+        profile_pic,
       });
   
       // Save the user to the database

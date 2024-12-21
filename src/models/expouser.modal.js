@@ -19,6 +19,10 @@ const expoUserSchema = new Schema(
       type: String,
       required: true,
     },
+    profile_pic: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
