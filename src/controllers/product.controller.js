@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Purchase } from "../models/purchase.model.js";
 import { User } from "../models/user.modal.js";
 import { Packages } from "../models/packages.modal.js";
+
 export const addProduct = asyncHandler(async (req, res) => {
   const data = req.body;
   try {
@@ -85,7 +86,18 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
 // Buy Product Function
 export const buyProduct = asyncHandler(async (req, res) => {
-  const { productId, quantity, userId } = req.body;
+  const { 
+    productId,
+    quantity,
+    userId,
+    name,
+    email,
+    mobile,
+    address,
+    serviceName,
+    serviceFor,
+    requiredDocuments,
+    comment } = req.body;
 
   try {
     const product = await Product.findById(productId);
@@ -95,7 +107,18 @@ export const buyProduct = asyncHandler(async (req, res) => {
     }
 
     // Create the purchase record
-    const purchase = await Purchase.create({ productId: productId, quantity: quantity, userId: userId });
+    const purchase = await Purchase.create({ 
+      productId, 
+      quantity,
+      userId,
+      name,
+      email,
+      mobile,
+      address,
+      serviceName,
+      serviceFor,
+      requiredDocuments,
+      comment });
 
     return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
   } catch (error) {

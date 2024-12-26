@@ -3,27 +3,34 @@ import mongoose, { Schema } from "mongoose";
 const PurchaseSchema = new Schema({
   productId: {
     type: Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
+    ref: "Product",
+    required: true,
   },
   quantity: {
     type: Number,
   },
   userId: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: "User",
+    required: true,
   },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  mobile: { type: String, required: true },
+  address: { type: String, required: true },
+  serviceName: { type: String, required: true },
+  serviceFor: { type: String, enum: ["Self", "Client"], default: "Self" },
+  requiredDocuments: { type: String, required: true },
+  comment: { type: String },
   purchaseDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   status: {
     type: String,
     enum: ["Pending", "Reject", "Approve"],
-    default: "Pending"
-  }
-
+    default: "Pending",
+  },
 });
 
-export const Purchase = mongoose.model('Purchase', PurchaseSchema);
+export const Purchase = mongoose.model("Purchase", PurchaseSchema);
