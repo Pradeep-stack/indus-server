@@ -59,7 +59,7 @@ export const addToCart = asyncHandler(async (req, res) => {
   
       if (productIndex > -1) {
         // Update total price
-        cart.totalPrice -= cart.items[productIndex].quantity * (await Product.findById(productId)).price;
+        cart.totalPrice -= cart.items[productIndex].quantity * (await Product.findById(productId)).service_price;
   
         // Remove the product
         cart.items.splice(productIndex, 1);
