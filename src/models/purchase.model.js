@@ -28,7 +28,7 @@ const PurchaseSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Reject", "Approve"],
+    enum: ["Pending", "Reject", "Approve","Paid", "Failed"],
     default: "Pending",
   },
 });

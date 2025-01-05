@@ -85,6 +85,48 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 // Buy Product Function
+// export const buyProduct = asyncHandler(async (req, res) => {
+//   const { 
+//     productId,
+//     quantity,
+//     userId,
+//     name,
+//     email,
+//     mobile,
+//     address,
+//     serviceName,
+//     serviceFor,
+//     requiredDocuments,
+//     comment } = req.body;
+
+//   try {
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+//     }
+
+//     // Create the purchase record
+//     const purchase = await Purchase.create({ 
+//       productId, 
+//       quantity,
+//       userId,
+//       name,
+//       email,
+//       mobile,
+//       address,
+//       serviceName,
+//       serviceFor,
+//       requiredDocuments,
+//       comment });
+
+//     return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
+//   } catch (error) {
+//     return res.status(500).json(new ApiResponse(500, null, error.message));
+//   }
+// });
+
+// new api with payment gatway integration
 export const buyProduct = asyncHandler(async (req, res) => {
   const { 
     productId,
@@ -97,11 +139,12 @@ export const buyProduct = asyncHandler(async (req, res) => {
     serviceName,
     serviceFor,
     requiredDocuments,
-    comment } = req.body;
+    comment 
+  } = req.body;
 
   try {
+    // Check if the product exists
     const product = await Product.findById(productId);
-
     if (!product) {
       return res.status(404).json(new ApiResponse(404, null, "Product not found"));
     }
@@ -118,9 +161,33 @@ export const buyProduct = asyncHandler(async (req, res) => {
       serviceName,
       serviceFor,
       requiredDocuments,
-      comment });
+      comment 
+    });
 
-    return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
+    // Initiate payment with PhonePe or other gateway
+    const paymentPayload = {
+      purchaseId: purchase._id,
+      amount: product.price * quantity, // Calculate total amount
+      userId,
+      name,
+      email,
+      mobile,
+    };
+
+    const paymentResponse = await initiatePayment(paymentPayload);
+
+    if (!paymentResponse.success) {
+      return res
+        .status(500)
+        .json(new ApiResponse(500, null, "Payment initiation failed"));
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, { 
+        purchase, 
+        paymentUrl: paymentResponse.paymentUrl 
+      }, "Product purchased successfully. Proceed to payment.")
+    );
   } catch (error) {
     return res.status(500).json(new ApiResponse(500, null, error.message));
   }

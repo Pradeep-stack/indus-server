@@ -27,6 +27,7 @@ import packagesRoutes from "./routes/packages.routes.js"
 import { upload, uploadToS3 } from './utils/awsImageUpload.js';
 import exposuerRouter from "./routes/expouser.routes.js"
 import cartRouter from "./routes/cart.routes.js"
+import phoneRouter from "./routes/phonepe.routes.js"
 // import { weekPerHours } from "./middlewares/createSingleObject.js";
 
 //routes declaration
@@ -38,6 +39,7 @@ app.use("/api/v1", productRouter)
 app.use("/api/v1/packages", packagesRoutes);
 app.use("/api/v1/expo", exposuerRouter)
 app.use("/api/v1", cartRouter)
+app.use("/payment", phoneRouter)
 
 //multer setup
 app.post('/upload', upload.single('image'), uploadToS3);
@@ -56,3 +58,39 @@ app.get('/download', (req, res) => {
   
 
 export {app}
+
+
+// import express from'express';
+// import axios from'axios';
+// import crypto from'crypto';
+// import cors from"cors";
+// import { v4 as uuidv4 } from'uuid';
+// import dotenv from "dotenv";
+// const app = express();
+// dotenv.config({
+//   path: "./env",
+// });
+
+// app.use(express.json());
+// app.use(cors());
+
+
+// const MERCHANT_KEY="944a13ea-89fe-47e2-bb9c-34bce182cdf1"
+// const MERCHANT_ID="M22CA7BWH4KS2"
+
+// const MERCHANT_BASE_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
+// const MERCHANT_STATUS_URL = "https://api.phonepe.com/apis/hermes/pg/v1/status"
+
+
+// // const MERCHANT_KEY="099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
+// // const MERCHANT_ID="PGTESTPAYUAT"
+
+// // const MERCHANT_BASE_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
+// // const MERCHANT_STATUS_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status"
+
+// const redirectUrl="http://localhost:8000/status"
+
+// const successUrl="http://localhost:5173/payment-success"
+// const failureUrl="http://localhost:5173/payment-failure"
+
+
