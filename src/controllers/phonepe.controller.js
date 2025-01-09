@@ -103,7 +103,7 @@ export const initiatePayment= async (req, res) => {
         mobileNumber: mobileNumber,
         amount : amount * 100,
         merchantTransactionId: orderId,
-        redirectUrl: `${redirectUrl}/?id=${orderId}`,
+        redirectUrl: `${redirectUrl}/${orderId}`,
         redirectMode: 'GET',
         paymentInstrument: {
             type: 'PAY_PAGE'
