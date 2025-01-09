@@ -92,6 +92,7 @@ const redirectUrl="https://api.indusdigicart.com/payment/callback"
 const successUrl="https://indusdigicart.com/payment-success.php"
 const failureUrl="https://indusdigicart.com/payment-failed.php"
 
+
 export const initiatePayment= async (req, res) => {
 
     const {name, mobileNumber, amount} = req.body;
@@ -103,7 +104,7 @@ export const initiatePayment= async (req, res) => {
         mobileNumber: mobileNumber,
         amount : amount * 100,
         merchantTransactionId: orderId,
-        redirectUrl: `${redirectUrl}/${orderId}`,
+        redirectUrl: `${redirectUrl}/?id=${orderId}`,
         redirectMode: 'GET',
         paymentInstrument: {
             type: 'PAY_PAGE'
