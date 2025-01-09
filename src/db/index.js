@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
-import { DB_NAME } from "../constant.js";
+// import { DB_NAME } from "../constant.js";
 
 const connectDB = async () => {
   try {
     const connectResponse = await mongoose.connect(
-      `${process.env.DB_URL}/${DB_NAME}`
+      `${process.env.DB_URL}/indus`,{
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
     );
     console.log("CONNECTION SUCCESS: ", connectResponse.connection.host)
   } catch (error) {
