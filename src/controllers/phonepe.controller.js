@@ -104,7 +104,7 @@ export const initiatePayment= async (req, res) => {
         mobileNumber: mobileNumber,
         amount : amount * 100,
         merchantTransactionId: orderId,
-        redirectUrl: `${redirectUrl}/?id=${orderId}`,
+        redirectUrl: `${redirectUrl}/${orderId}`,
         redirectMode: 'GET',
         paymentInstrument: {
             type: 'PAY_PAGE'
@@ -132,6 +132,7 @@ export const initiatePayment= async (req, res) => {
     try {
         
         const response = await axios.request(option);
+        console.log("response++++++++++++", response)   
          res.status(200).json({msg : "OK", url: response.data.data.instrumentResponse.redirectInfo.url})
     } catch (error) {
         console.log("error in payment", error)
@@ -142,6 +143,7 @@ export const initiatePayment= async (req, res) => {
 
 export const paymentCallback = async (req, res) => {
     const merchantTransactionId = req.query.id;
+    console.log("merchantTransactionId", merchantTransactionId)
 
     const keyIndex = 1
     const string  = `/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}` + MERCHANT_KEY
