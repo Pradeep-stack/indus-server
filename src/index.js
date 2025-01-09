@@ -8,9 +8,6 @@ dotenv.config({
   path: "./env",
 });
 
-// connectDB()
-
-// for db connect
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
@@ -21,10 +18,4 @@ connectDB()
     console.log("DTABASE connection error !!!", error);
   });
 
-// const app = express();
 
-// app.get("/", (req, res) => {
-//   res.send("hello pk");
-// });
-
-// app.listen(PORT, console.log(`app listing on ${PORT}`));

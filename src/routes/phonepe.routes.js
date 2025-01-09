@@ -3,7 +3,7 @@ import {paymentCallback, initiatePayment} from "../controllers/phonepe.controlle
 
 const router = express.Router();
 
-router.post("/callback/:id", paymentCallback);
+router.get("/callback/:id", paymentCallback);
 router.post("/initiate", initiatePayment);
 
 export default router;
