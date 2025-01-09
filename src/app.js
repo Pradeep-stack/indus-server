@@ -52,6 +52,7 @@ app.get('/download', (req, res) => {
     ytdl(videoUrl, { format: 'mp4' }).pipe(res);
   });
   
+  console.log("db url:",process.env.DB_URL);
 
 export {app}
 
