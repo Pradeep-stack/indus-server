@@ -159,6 +159,7 @@ export const paymentCallback = async (req, res) => {
     }
 
     axios.request(option).then((response) => {
+        console.log("response", response)
         if (response.data.success === true){
             return res.redirect(successUrl)
         }else{
