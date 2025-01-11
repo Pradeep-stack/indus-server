@@ -27,11 +27,11 @@ const MERCHANT_ID="PGTESTPAYUAT86"
 const MERCHANT_BASE_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
 const MERCHANT_STATUS_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status"
 
-// const redirectUrl="https://api.indusdigicart.com/payment/status"
+const redirectUrl="https://api.indusdigicart.com/payment/status"
 // const redirectUrl="https://api.indusdigicart.com/payment/status"
 // const successUrl="https://indusdigicart.com/payment-success.php"
 // const failureUrl="https://indusdigicart.com/payment-failed.php"
-const redirectUrl="http://localhost:4001/payment/status"
+// const redirectUrl="http://localhost:4001/payment/status"
 const successUrl="https://indusdigicart.com/payment-success.php"
 const failureUrl="https://indusdigicart.com/payment-failed.php"
 
