@@ -16,20 +16,22 @@ const router = express.Router();
 
 
 
-const MERCHANT_KEY="944a13ea-89fe-47e2-bb9c-34bce182cdf1"
-const MERCHANT_ID="M22CA7BWH4KS2"
-// const MERCHANT_KEY="099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
-// const MERCHANT_ID="PGTESTPAYUAT"
+// const MERCHANT_KEY="944a13ea-89fe-47e2-bb9c-34bce182cdf1"
+// const MERCHANT_ID="M22CA7BWH4KS2"
+const MERCHANT_KEY="96434309-7796-489d-8924-ab56988a6076"
+const MERCHANT_ID="PGTESTPAYUAT86"
 
-const MERCHANT_BASE_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
-const MERCHANT_STATUS_URL = "https://api.phonepe.com/apis/hermes/pg/v1/status"
+// const MERCHANT_BASE_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
+// const MERCHANT_STATUS_URL = "https://api.phonepe.com/apis/hermes/pg/v1/status"
 
-// const MERCHANT_BASE_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
-// const MERCHANT_STATUS_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status"
+const MERCHANT_BASE_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
+const MERCHANT_STATUS_URL="https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status"
 
 // const redirectUrl="https://api.indusdigicart.com/payment/status"
-const redirectUrl="https://api.indusdigicart.com/payment/status"
-
+// const redirectUrl="https://api.indusdigicart.com/payment/status"
+// const successUrl="https://indusdigicart.com/payment-success.php"
+// const failureUrl="https://indusdigicart.com/payment-failed.php"
+const redirectUrl="http://localhost:4001/payment/status"
 const successUrl="https://indusdigicart.com/payment-success.php"
 const failureUrl="https://indusdigicart.com/payment-failed.php"
 
