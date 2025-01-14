@@ -93,4 +93,35 @@ const getUserById = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, user, "User retrieved successfully"));
 });
-export { registerExpoUser, getAllExpoUsers, getUserById };
+
+// Update User by Phone
+const updateUserById = asyncHandler(async (req, res) => {
+  const phone = req.params.phone;
+  const updates = req.body;
+
+  const user = await ExpoUser.findOneAndUpdate({ phone }, updates, {
+    new: true, // Return the updated document
+    runValidators: true, // Enforce schema validation on update
+  });
+
+  if (!user) {
+    return res.status(400).json(new ApiError(400, "User not found"));
+  }
+
+  return res.json(new ApiResponse(200, user, "User updated successfully"));
+});
+
+// Delete User by Phone
+const deleteUserById = asyncHandler(async (req, res) => {
+  const phone = req.params.phone;
+
+  const user = await ExpoUser.findOneAndDelete({ phone });
+
+  if (!user) {
+    return res.status(400).json(new ApiError(400, "User not found"));
+  }
+
+  return res.json(new ApiResponse(200, null, "User deleted successfully"));
+});
+
+export { registerExpoUser, getAllExpoUsers, getUserById , updateUserById, deleteUserById };

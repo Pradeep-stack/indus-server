@@ -21,7 +21,18 @@ const expoUserSchema = new Schema(
     },
     profile_pic: {
       type: String,
+      // required: true,
+    },
+    userType: {
+      type: String,
+      enum: ["admin", "user", "superadmin"],
       required: true,
+    },
+    email: {
+      type: String,
+    },
+    password: {
+      type: String,
     },
   },
   {
