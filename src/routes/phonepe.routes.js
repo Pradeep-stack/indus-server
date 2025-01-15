@@ -44,7 +44,7 @@ router.post('/create-order', async (req, res) => {
     //payment
     const paymentPayload = {
         merchantId : MERCHANT_ID,
-        merchantUserId: name,
+        merchantUserId: orderId,
         mobileNumber: mobileNumber,
         amount : amount * 100,
         merchantTransactionId: orderId,
