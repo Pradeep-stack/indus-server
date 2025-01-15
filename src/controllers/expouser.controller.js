@@ -19,33 +19,87 @@ const generateUniqueId = async () => {
   };
 
 
-  const registerExpoUser = asyncHandler(async (req, res) => {
-    const { name, company, phone, city, profile_pic } = req.body;
+  // const registerExpoUser = asyncHandler(async (req, res) => {
+  //   const { name, company, phone, city, profile_pic } = req.body;
   
-    if (!name || !company || !phone || !city ||!profile_pic) {
+  //   if (!name || !company || !phone || !city ||!profile_pic) {
+  //     return res
+  //       .status(400)
+  //       .json(new ApiError(400, "All fields (name, company, phone, city) are required"));
+  //   }
+  
+  //   try {
+  //     const id = await generateUniqueId();
+
+  //     const existingUser = await ExpoUser.findOne({ phone });
+  
+  //     if (existingUser) {
+  //       return res
+  //         .status(400)
+  //         .json({ status: 400, message: "Phone number already exists" });
+  //     }
+  
+  //     const newUser = new ExpoUser({
+  //       id,
+  //       name,
+  //       company,
+  //       phone,
+  //       city,
+  //       profile_pic,
+  //     });
+  
+  //     // Save the user to the database
+  //     const createdUser = await newUser.save();
+  
+  //     // Return success response
+  //     return res
+  //       .status(201)
+  //       .json(new ApiResponse(201, createdUser, "User registered successfully"));
+  //   } catch (error) {
+  //     // Log the error for debugging
+  //     console.error("Error registering user:", error);
+  
+  //     // Return a generic error response
+  //     return res
+  //       .status(500)
+  //       .json(new ApiError(500, "Internal server error"));
+  //   }
+  // });
+  
+ const registerExpoUser = asyncHandler(async (req, res) => {
+    const { name, company, phone, city, profile_pic, userType, email, password } = req.body;
+  
+    // Validate required fields
+    if (!name || !phone || !city || !userType) {
       return res
         .status(400)
-        .json(new ApiError(400, "All fields (name, company, phone, city) are required"));
+        .json(new ApiError(400, "Fields (name, phone, city, userType) are required"));
     }
   
     try {
+      // Generate a unique ID
       const id = await generateUniqueId();
-
+  
+      // Check if the phone number already exists
       const existingUser = await ExpoUser.findOne({ phone });
   
       if (existingUser) {
         return res
           .status(400)
-          .json({ status: 400, message: "Phone number already exists" });
+          .json(new ApiError(400, "Phone number already exists"));
       }
   
+      // Create a new user instance
       const newUser = new ExpoUser({
         id,
         name,
-        company,
+        company, // Optional as per your schema
         phone,
         city,
-        profile_pic,
+        profile_pic, // Optional as per your schema
+        userType,
+        email, // Optional
+        password, // Optional, should be hashed in real applications
       });
   
       // Save the user to the database
@@ -65,8 +119,6 @@ const generateUniqueId = async () => {
         .json(new ApiError(500, "Internal server error"));
     }
   });
-  
-  
 
 const getAllExpoUsers = asyncHandler(async (req, res) => {
   const users = await ExpoUser.find();

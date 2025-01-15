@@ -9,7 +9,7 @@ const expoUserSchema = new Schema(
     },
     company: {
       type: String,
-      required: true,
+      // required: true,
     },
     phone: {
       type: Number,
