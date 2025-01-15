@@ -108,10 +108,10 @@ router.post('/status', async (req, res) => {
     axios.request(option).then((response) => {
         if (response.data.success === true){
             // return res.redirect(successUrl)
-            res.status(200).json({msg : "Payment Success", response: response.data})
+            // res.status(200).json({msg : "Payment Success", response: response.data})
         }else{
             // return res.redirect(failureUrl)
-            res.status(200).json({msg : "Payment Success", response: response.data})
+            // res.status(200).json({msg : "Payment Success", response: response.data})
         }
     })
 });
