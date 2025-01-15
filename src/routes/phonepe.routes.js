@@ -195,8 +195,10 @@ router.post('/status/:txnId', async (req, res) => {
     // CHECK PAYMENT TATUS
     axios.request(options).then(async(response) => {
         if (response.data.success === true) {
+            console.log("response", response)
             return res.redirect(successUrl)
         } else {
+            console.log("response", response)
             return res.redirect(successUrl)
         }
     })
