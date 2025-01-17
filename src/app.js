@@ -25,8 +25,8 @@ import packagesRoutes from "./routes/packages.routes.js"
 import { upload, uploadToS3 } from './utils/awsImageUpload.js';
 import exposuerRouter from "./routes/expouser.routes.js"
 import cartRouter from "./routes/cart.routes.js"
-import phoneRouter from "./routes/phonepe.routes.js"
-
+// import phoneRouter from "./routes/phonepe.routes.js"
+import razorpayRouter from "./routes/razorpay.routes.js"
 //routes declaration
 app.use("/api/v1", userRouter)
 app.use("/api/v1", videoRouter)
@@ -35,7 +35,8 @@ app.use("/api/v1", productRouter)
 app.use("/api/v1/packages", packagesRoutes);
 app.use("/api/v1/expo", exposuerRouter)
 app.use("/api/v1", cartRouter)
-app.use("/payment", phoneRouter)
+// app.use("/payment", phoneRouter)
+app.use("/payment", razorpayRouter)
 
 //multer setup
 app.post('/upload', upload.single('image'), uploadToS3);
