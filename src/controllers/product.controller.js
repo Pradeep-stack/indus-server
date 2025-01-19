@@ -85,47 +85,97 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 // Buy Product Function
-export const buyProduct = asyncHandler(async (req, res) => {
-  const { 
-    productId,
-    quantity,
-    userId,
-    name,
-    email,
-    mobile,
-    address,
-    serviceName,
-    serviceFor,
-    requiredDocuments,
-    comment } = req.body;
+// export const buyProduct = asyncHandler(async (req, res) => {
+//   const { 
+//     productId,
+//     quantity,
+//     userId,
+//     name,
+//     email,
+//     mobile,
+//     address,
+//     serviceName,
+//     serviceFor,
+//     requiredDocuments,
+//     comment } = req.body;
 
-  try {
-    const product = await Product.findById(productId);
+//   try {
+//     const product = await Product.findById(productId);
 
-    if (!product) {
-      return res.status(404).json(new ApiResponse(404, null, "Product not found"));
-    }
+//     if (!product) {
+//       return res.status(404).json(new ApiResponse(404, null, "Product not found"));
+//     }
 
-    // Create the purchase record
-    const purchase = await Purchase.create({ 
-      productId, 
-      quantity,
-      userId,
-      name,
-      email,
-      mobile,
-      address,
-      serviceName,
-      serviceFor,
-      requiredDocuments,
-      comment });
+//     // Create the purchase record
+//     const purchase = await Purchase.create({ 
+//       productId, 
+//       quantity,
+//       userId,
+//       name,
+//       email,
+//       mobile,
+//       address,
+//       serviceName,
+//       serviceFor,
+//       requiredDocuments,
+//       comment });
 
-    return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
-  } catch (error) {
-    return res.status(500).json(new ApiResponse(500, null, error.message));
-  }
-});
+//     return res.status(200).json(new ApiResponse(200, purchase, "Product purchased successfully"));
+//   } catch (error) {
+//     return res.status(500).json(new ApiResponse(500, null, error.message));
+//   }
+// });
 
+
+
+ export const buyProduct = asyncHandler(async (req, res) => {
+   const { productId, quantity, userId, status } = req.body;
+   try {
+     const product = await Packages.findById(productId);
+
+     if (!product) {
+       return res
+         .status(404)
+         .json(new ApiResponse(404, null, "Product not found"));
+     }
+      //Create the purchase record
+     const purchase = await Purchase.create({
+       productId: productId,
+       quantity: quantity,
+       userId: userId,
+       status:status,
+     });
+      //Fetch the user who made the purchase
+     const user = await User.findById(userId);
+     if (user.referredBy) {
+       // Find the referring user
+       const referringUser = await User.findOne({
+         referral_code: user.referredBy,
+       });
+
+       if (referringUser) {
+          //Add commission to the referring user
+         let commission;
+         if (product.workingArea == 15) {
+           commission =parseInt(product.workingArea)  * 0.1;
+         } else if (product.workingArea == 50) {
+           commission = parseInt(product.workingArea) * 0.2;
+         } else if (product.workingArea == 150) {
+           commission = parseInt(product.workingArea) * 0.4;
+         }
+          //Assuming 10% commission
+         referringUser.points += commission;  //Assuming points are being used for commission
+         await referringUser.save();
+       }
+     }
+
+     return res
+       .status(200)
+       .json(new ApiResponse(200, purchase, "Product purchased successfully"));
+   } catch (error) {
+     return res.status(500).json(new ApiResponse(500, null, error.message));
+   }
+ });
 // new api with payment gatway integration
 // export const buyProduct = asyncHandler(async (req, res) => {
 //   const { 
