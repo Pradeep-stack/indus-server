@@ -150,7 +150,7 @@ export const buyProduct = asyncHandler(async (req, res) => {
 
       if (referringUser) {
         let commission;
-        commission = product.service_price * (product.commision / 100);
+        commission = product.associateDiscount * (product.commision / 100);
         referringUser.points += commission;
         await referringUser.save();
       }
