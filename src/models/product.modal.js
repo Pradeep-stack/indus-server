@@ -15,7 +15,7 @@ const productSchema = new Schema(
       required: true,
     },
     service_price: {
-      type: String,
+      type: Number,
       required: true,
     },
     service_name: {
@@ -32,6 +32,10 @@ const productSchema = new Schema(
     userDiscount:{
       type: Number,
       default: 0
+    },
+    commision:{
+      type: Number,
+      default: 3
     },
     region:{
       type: String,

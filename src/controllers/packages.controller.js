@@ -10,7 +10,7 @@ export const createPackage = async (req, res) => {
       subscription,
       lifetime,
       renewable,
-      workingArea,
+      package_price,
       overseas,
       region,
       packagePlan,
@@ -24,7 +24,7 @@ export const createPackage = async (req, res) => {
       subscription: subscription,
       lifetime: lifetime,
       renewable: renewable,
-      workingArea: workingArea,
+      package_price: package_price,
       overseas: overseas,
       region: region,
       packagePlan: packagePlan,
@@ -47,13 +47,13 @@ export const createPackage = async (req, res) => {
 
       if (referringUser) {
         if (packagePlan == "package-1") {
-          referringUser.points += parseInt(workingArea) * 0.1;
+          referringUser.points += parseInt(package_price) * 0.1;
           await referringUser.save();
         } else if (packagePlan == "package-2") {
-          referringUser.points += parseInt(workingArea) * 0.2;
+          referringUser.points += parseInt(package_price) * 0.2;
           await referringUser.save();
         } else if (packagePlan == "package-3") {
-          referringUser.points += parseInt(workingArea) * 0.4;
+          referringUser.points += parseInt(package_price) * 0.4;
           await referringUser.save();
         }
       } else {

@@ -31,7 +31,7 @@ const packagesSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    workingArea: {
+    package_price: {
       type: String,
       required: true,
     },
