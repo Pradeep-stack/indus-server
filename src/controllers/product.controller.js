@@ -127,7 +127,6 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 // });
 
 
-
  export const buyProduct = asyncHandler(async (req, res) => {
    const { productId, quantity, userId, status } = req.body;
    try {
@@ -176,6 +175,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
      return res.status(500).json(new ApiResponse(500, null, error.message));
    }
  });
+ 
 // new api with payment gatway integration
 // export const buyProduct = asyncHandler(async (req, res) => {
 //   const { 

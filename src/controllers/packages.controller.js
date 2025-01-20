@@ -44,6 +44,7 @@ export const createPackage = async (req, res) => {
       const referringUser = await User.findOne({
         referral_code: referredBy,
       });
+
       if (referringUser) {
         if (packagePlan == "package-1") {
           referringUser.points += parseInt(workingArea) * 0.1;
