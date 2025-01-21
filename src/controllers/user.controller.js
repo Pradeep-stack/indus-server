@@ -51,9 +51,10 @@ const registerUser = asyncHandler(async (req, res) => {
       .json(new ApiError(409, "User with email already exists"));
   }
   const innp= region==="india"?"IN":"NP";
-  const newReferralCode =region + nanoid(10);
+  
+  const newReferralCode =innp + nanoid(10);
 
-  const user_type = referredBy ? "Admin" : "User";
+  const user_type =  "User";
 
   const user = new User({
     username,

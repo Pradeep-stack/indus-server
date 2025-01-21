@@ -16,7 +16,6 @@ export const createPackage = async (req, res) => {
       packagePlan,
       referredBy,
     } = req.body;
-
     const newPackage = new Packages({
       userId: userId,
       plan: plan,
@@ -46,13 +45,13 @@ export const createPackage = async (req, res) => {
       });
 
       if (referringUser) {
-        if (packagePlan == "package-1") {
+        if (packagePlan === "package-1") {
           referringUser.points += parseInt(package_price) * 0.1;
           await referringUser.save();
-        } else if (packagePlan == "package-2") {
+        } else if (packagePlan === "package-2") {
           referringUser.points += parseInt(package_price) * 0.2;
           await referringUser.save();
-        } else if (packagePlan == "package-3") {
+        } else if (packagePlan === "package-3") {
           referringUser.points += parseInt(package_price) * 0.4;
           await referringUser.save();
         }

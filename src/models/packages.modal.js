@@ -47,7 +47,7 @@ const packagesSchema = new Schema(
     status: {
       type: String,
       enum: ["Pending", "Reject", "Approve"],
-      default: "Pending"
+      default: "Approve"
     }
   },
   {
