@@ -34,6 +34,9 @@ const expoUserSchema = new Schema(
     password: {
       type: String,
     },
+    stall_number: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

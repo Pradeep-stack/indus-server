@@ -56,10 +56,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Upload to S3 function
 const uploadToS3 = (req, res) => {
   const params = {
-    Bucket: 'indusglobal',
+    Bucket: process.env.AWS_BUCKET_NAME,
     Key: req.file.originalname,
     Body: req.file.buffer,
     ContentType: req.file.mimetype
+   
   };
 
   s3.upload(params, (err, data) => {
