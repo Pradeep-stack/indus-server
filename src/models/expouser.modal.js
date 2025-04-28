@@ -19,13 +19,17 @@ const expoUserSchema = new Schema(
       type: String,
       required: true,
     },
+    state: {
+      type: String,
+      required: true,
+    },
     profile_pic: {
       type: String,
       // required: true,
     },
     userType: {
       type: String,
-      enum: ["admin", "user", "superadmin"],
+      enum: ["agent", "user", "exhibitor ", "member", "admin", "superadmin"],
       required: true,
     },
     email: {

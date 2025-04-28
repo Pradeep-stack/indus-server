@@ -2,7 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ExpoUser } from "../models/expouser.modal.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import csv from 'csv-parser';
+import { Readable } from 'stream';
 
 const generateUniqueId = async () => {
     let uniqueId;
@@ -18,6 +19,71 @@ const generateUniqueId = async () => {
     return uniqueId;
   };
 
+// controllers/expouser.controller.ts (continue in same file)
+
+const importExpoUsers = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json(new ApiError(400, "CSV file is required"));
+  }
+
+  let users= [];
+
+  const stream = Readable.from(req.file.buffer);
+
+
+  stream.pipe(csv())
+    .on('data', (row) => {
+      users.push(row);
+    })
+    .on('end', async () => {
+      const report = [];
+
+      for (const user of users) {
+        try {
+          const { name, company, phone, city, profile_pic, userType, email, password, state } = user;
+
+          if (!name || !phone || !city || !state || !userType) {
+            throw new Error("Required fields missing (name, phone, city, userType)");
+          }
+
+          const existingUser = await ExpoUser.findOne({ phone });
+          if (existingUser) {
+            throw new Error("Phone number already exists");
+          }
+
+          const id = await generateUniqueId();
+
+          const newUser = new ExpoUser({
+            id,
+            name,
+            company,
+            phone,
+            city,
+            state,
+            profile_pic,
+            userType,
+            email,
+            password,  // (ideally hash it if needed)
+          });
+
+          await newUser.save();
+
+          report.push({ phone, status: "success" });
+
+        } catch (error) {
+          report.push({ phone: user.phone, status: "failed", reason: error.message });
+        }
+      }
+
+      const summary = {
+        total: report.length,
+        success: report.filter(r => r.status === "success").length,
+        failed: report.filter(r => r.status === "failed").length,
+      };
+
+      return res.status(200).json({ summary, report });
+    });
+});
 
   // const registerExpoUser = asyncHandler(async (req, res) => {
   //   const { name, company, phone, city, profile_pic } = req.body;
@@ -67,10 +133,10 @@ const generateUniqueId = async () => {
   // });
   
  const registerExpoUser = asyncHandler(async (req, res) => {
-    const { name, company, phone, city, profile_pic, userType, email, password } = req.body;
+    const { name, company, phone, city, profile_pic, userType, email, password, state } = req.body;
   
     // Validate required fields
-    if (!name || !phone || !city || !userType) {
+    if (!name || !phone || !city || !state ||  !userType) {
       return res
         .status(400)
         .json(new ApiError(400, "Fields (name, phone, city, userType) are required"));
@@ -96,6 +162,7 @@ const generateUniqueId = async () => {
         company, // Optional as per your schema
         phone,
         city,
+        state,
         profile_pic, // Optional as per your schema
         userType,
         email, // Optional
@@ -176,4 +243,4 @@ const deleteUserById = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
-export { registerExpoUser, getAllExpoUsers, getUserById , updateUserById, deleteUserById };
+export { registerExpoUser, getAllExpoUsers, getUserById , updateUserById, deleteUserById, importExpoUsers };
