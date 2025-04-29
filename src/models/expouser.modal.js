@@ -41,6 +41,10 @@ const expoUserSchema = new Schema(
     stall_number: {
       type: Number,
     },
+    isWatched :{
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,
