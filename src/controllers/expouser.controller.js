@@ -40,7 +40,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
 
       for (const user of users) {
         try {
-          const { name, company, phone, city, profile_pic, userType, email, password, state } = user;
+          const { name, company, phone, city, profile_pic, userType, email, password, state, stall_number } = user;
 
           if (!name || !phone || !city || !state || !userType) {
             throw new Error("Required fields missing (name, phone, city, userType)");
@@ -63,7 +63,8 @@ const importExpoUsers = asyncHandler(async (req, res) => {
             profile_pic,
             userType,
             email,
-            password,  // (ideally hash it if needed)
+            password,
+            stall_number  // (ideally hash it if needed)
           });
 
           await newUser.save();
