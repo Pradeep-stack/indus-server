@@ -44,7 +44,8 @@ const expoUserSchema = new Schema(
     isWatched :{
       type: Boolean,
       default: false
-    }
+    },
+    badge_pdf_url: { type: String }
   },
   {
     timestamps: true,
