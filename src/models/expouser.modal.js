@@ -45,7 +45,7 @@ const expoUserSchema = new Schema(
       type: Boolean,
       default: false
     },
-    badge_pdf_url: { type: String }
+    badge_image_url: { type: String }
   },
   {
     timestamps: true,

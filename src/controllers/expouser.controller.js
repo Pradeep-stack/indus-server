@@ -6,9 +6,10 @@ import csv from "csv-parser";
 import { Readable } from "stream";
 import { htmlContent } from "./content.js";
 import { uploadFile } from "../utils/uploadFils.js";
-import htmlToPdf from 'html-pdf-node';
+import htmlToPdf from "html-pdf-node";
 import { sendMessage } from "../utils/exp/sendMessage.js";
-
+import puppeteer from "puppeteer";
+import fs from "fs";
 const generateUniqueId = async () => {
   let uniqueId;
   let isUnique = false;
@@ -85,35 +86,46 @@ const importExpoUsers = asyncHandler(async (req, res) => {
           });
 
           await createdUser.save();
-        
+
           if (createdUser) {
-            const file = {
-              content: htmlContent(createdUser),
-            };
-            const options = {
-              format: "A4",
-              printBackground: true,
-            };
-          
+            const html = htmlContent(createdUser);
+
             try {
-              const pdfBuffer = await htmlToPdf.generatePdf(file, options);
-              const key = `admitcards/${createdUser.id}-${Date.now()}.pdf`;
-          
+              const browser = await puppeteer.launch({ headless: "new" });
+              const page = await browser.newPage();
+
+              await page.setContent(html, { waitUntil: "networkidle0" });
+
+              await page.setViewport({
+                width: 350, 
+                height: 500,
+                deviceScaleFactor: 2, 
+              });
+
+              const imageBuffer = await page.screenshot({
+                type: "png",
+                fullPage: true,
+              });
+
+              await browser.close();
+
+              const key = `admitcards/${createdUser.id}-${Date.now()}.png`;
               const s3Upload = await uploadFile({
                 key,
-                file: pdfBuffer,
-                contentType: "application/pdf",
+                file: imageBuffer,
+                contentType: "image/png",
               });
-          
-              
-              createdUser.badge_pdf_url = s3Upload.Location;
-          
-              
-              await sendMessage(createdUser, s3Upload.Location);
-          
+
+              const imageUrl = s3Upload.Location;
+
+              if (imageUrl) {
+                await sendMessage(createdUser, imageUrl);
+                createdUser.badge_image_url = imageUrl;
+              }
+
               await createdUser.save();
-            } catch (pdfError) {
-              console.error("PDF/S3 upload failed:", pdfError);
+            } catch (error) {
+              console.error("Image generation failed:", error);
             }
           }
 
@@ -235,38 +247,90 @@ const registerExpoUser = asyncHandler(async (req, res) => {
 
     // Save the user to the database
     const createdUser = await newUser.save();
+    // this is use for pdf generation
+    // if (createdUser) {
+    //   const file = {
+    //     content: htmlContent(createdUser),
+    //   };
+    //   const options = {
+    //     width: '90mm',
+    //     height: '120mm',
+    //     printBackground: true,
+    //     preferCSSPageSize: true,
+    //     margin: {
+    //       top: '0cm',
+    //       right: '0cm',
+    //       bottom: '0cm',
+    //       left: '0cm',
+    //     },
+    //     scale: 0.9,
+    //   };
 
+    //   try {
+    //     const pdfBuffer = await htmlToPdf.generatePdf(file, options);
+    //     const key = `admitcards/${createdUser.id}-${Date.now()}.pdf`;
+
+    //     const s3Upload = await uploadFile({
+    //       key,
+    //       file: pdfBuffer,
+    //       contentType: "application/pdf",
+    //     });
+
+    //     const imageUrl = s3Upload.Location;
+
+    //     if (imageUrl) {
+    //       await sendMessage(createdUser, imageUrl);
+    //       createdUser.badge_pdf_url = imageUrl;
+    //     }
+
+    //     await createdUser.save();
+    //   } catch (pdfError) {
+    //     console.error("PDF/S3 upload failed:", pdfError);
+    //   }
+    // }
+    // this is use for image generation
     if (createdUser) {
-      const file = {
-        content: htmlContent(createdUser),
-      };
-      const options = {
-        format: "A4",
-        printBackground: true,
-      };
-    
+      const html = htmlContent(createdUser);
+
       try {
-        const pdfBuffer = await htmlToPdf.generatePdf(file, options);
-        const key = `admitcards/${createdUser.id}-${Date.now()}.pdf`;
-    
+        const browser = await puppeteer.launch({ headless: "new" });
+        const page = await browser.newPage();
+
+        await page.setContent(html, { waitUntil: "networkidle0" });
+
+        // Set viewport to your desired size (match your card size in px)
+        await page.setViewport({
+          width: 350, // Adjust based on your card width
+          height: 500,
+          deviceScaleFactor: 2, // Optional: higher quality
+        });
+
+        const imageBuffer = await page.screenshot({
+          type: "png",
+          fullPage: true,
+        });
+
+        await browser.close();
+
+        const key = `admitcards/${createdUser.id}-${Date.now()}.png`;
         const s3Upload = await uploadFile({
           key,
-          file: pdfBuffer,
-          contentType: "application/pdf",
+          file: imageBuffer,
+          contentType: "image/png",
         });
-    
-        
-        createdUser.badge_pdf_url = s3Upload.Location;
-    
-        
-        await sendMessage(createdUser, s3Upload.Location);
-    
+
+        const imageUrl = s3Upload.Location;
+
+        if (imageUrl) {
+          await sendMessage(createdUser, imageUrl);
+          createdUser.badge_image_url = imageUrl;
+        }
+
         await createdUser.save();
-      } catch (pdfError) {
-        console.error("PDF/S3 upload failed:", pdfError);
+      } catch (error) {
+        console.error("Image generation failed:", error);
       }
     }
-    
 
     // Return success response
     return res

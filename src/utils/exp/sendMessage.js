@@ -37,7 +37,7 @@ export const sendMessage = async (user, imageUrl) => {
     return;
   }
 
-  console.log("Preparing to send WhatsApp message for user:", user.phone);
+  console.log("Preparing to send WhatsApp message for user:", user.phone, imageUrl);
 
   try {
     const whatsAppData = {
