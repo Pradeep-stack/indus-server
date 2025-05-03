@@ -22,7 +22,7 @@ import videoRouter from "./routes/video.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import productRouter from "./routes/product.route.js"
 import packagesRoutes from "./routes/packages.routes.js"
-import { upload, uploadToS3 } from './utils/awsImageUpload.js';
+import { upload, uploadToS3, generateDownloadUrl } from './utils/awsImageUpload.js';
 import exposuerRouter from "./routes/expouser.routes.js"
 import cartRouter from "./routes/cart.routes.js"
 // import phoneRouter from "./routes/phonepe.routes.js"
@@ -40,6 +40,17 @@ app.use("/payment", razorpayRouter)
 
 //multer setup
 app.post('/upload', upload.single('image'), uploadToS3);
+// server.js
+app.get("/secure-download", (req, res) => {
+  const { url } = req.query; 
+  
+  try {
+    const downloadUrl = generateDownloadUrl(url);
+    res.json({ url: downloadUrl });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to generate secure URL" });
+  }
+});
 
 // youtube video download
 app.get('/download', (req, res) => {

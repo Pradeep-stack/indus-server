@@ -70,4 +70,15 @@ const uploadToS3 = (req, res) => {
   });
 };
 
-export  { upload, uploadToS3 };
+// 2. NEW: Generate Pre-Signed Download URL
+export const generateDownloadUrl = (s3Key) => {
+  const params = {
+    Bucket: "indusglobal",
+    Key: s3Key.replace("https://indusglobal.s3.ap-south-1.amazonaws.com/", ""), // Extract key from URL
+    Expires: 300, // 5-minute expiry
+    ResponseContentDisposition: 'attachment; filename="AdmitCard.png"',
+  };
+  return s3.getSignedUrl("getObject", params);
+}
+
+export { upload, uploadToS3, generateDownloadUrl };
