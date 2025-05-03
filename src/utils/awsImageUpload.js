@@ -71,7 +71,7 @@ const uploadToS3 = (req, res) => {
 };
 
 // 2. NEW: Generate Pre-Signed Download URL
-export const generateDownloadUrl = (s3Key) => {
+const generateDownloadUrl = (s3Key) => {
   const params = {
     Bucket: "indusglobal",
     Key: s3Key.replace("https://indusglobal.s3.ap-south-1.amazonaws.com/", ""), // Extract key from URL
