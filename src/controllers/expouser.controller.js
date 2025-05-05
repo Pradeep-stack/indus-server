@@ -154,69 +154,78 @@ const importExpoUsers = asyncHandler(async (req, res) => {
   }
 
   const report = [];
-  let browser; // Declare browser outside the loop
+  let browser;
 
   try {
     // Launch browser once for all users
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       headless: "new",
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const stream = Readable.from(req.file.buffer);
-    const csvStream = csv();
+    const csvStream = csv({
+      trim: true,               // Trim whitespace from values
+      skipEmptyLines: true,     // Skip empty lines
+      columns: true,            // Use first row as headers
+      skipRecordsWithEmptyValues: true, // Skip records with empty values
+      cast: (value, context) => { // Convert empty strings to undefined
+        if (context.column === 'phone') return value; // Keep phone as string
+        return value === '' ? undefined : value;
+      }
+    });
 
     let batch = [];
     const BATCH_SIZE = 10; // Process 10 users at a time
 
-    for await (const user of stream.pipe(csvStream)) {
+    for await (const rawUser of stream.pipe(csvStream)) {
       try {
-        const {
-          name,
-          company,
-          phone,
-          city,
-          profile_pic,
-          userType,
-          email,
-          password,
-          state,
-          stall_number,
-        } = user;
+        // Normalize field names (case-insensitive) and trim values
+        const user = {};
+        Object.entries(rawUser).forEach(([key, value]) => {
+          const normalizedKey = key.trim().toLowerCase();
+          user[normalizedKey] = typeof value === 'string' ? value.trim() : value;
+        });
+
+        // Debug log to see parsed data
+        console.log('Processing user:', user);
 
         // Validate required fields
-        if (!name || !phone || !city || !state || !userType) {
-          throw new Error("Required fields missing (name, phone, city, state, userType)");
+        const requiredFields = ['name', 'phone', 'city', 'state', 'usertype'];
+        const missingFields = requiredFields.filter(field => !user[field]);
+        
+        if (missingFields.length > 0) {
+          throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
         }
 
         // Validate phone format
-        if (!/^\d{10,15}$/.test(phone)) {
+        if (!/^\d{10,15}$/.test(user.phone)) {
           throw new Error("Invalid phone number format");
         }
 
         // Check for existing user
-        const existingUser = await ExpoUser.findOne({ phone });
+        const existingUser = await ExpoUser.findOne({ phone: user.phone });
         if (existingUser) {
           throw new Error("Phone number already exists");
         }
 
         // Generate ID and hash password
         const id = await generateUniqueId();
-        const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+        const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : undefined;
 
-        // Create user object
+        // Create user object with proper field mapping
         const userData = {
           id,
-          name: name.trim(),
-          company: company?.trim(),
-          phone: phone.trim(),
-          city: city.trim(),
-          state: state.trim(),
-          profile_pic: profile_pic?.trim(),
-          userType: userType.trim(),
-          email: email?.trim(),
+          name: user.name,
+          company: user.company,
+          phone: user.phone,
+          city: user.city,
+          state: user.state,
+          profile_pic: user.profile_pic || user['profile pic'],
+          userType: user.usertype || user.userType, // Handle different cases
+          email: user.email,
           password: hashedPassword,
-          stall_number: stall_number?.trim(),
+          stall_number: user.stall_number || user['stall number'],
         };
 
         batch.push(userData);
@@ -228,7 +237,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
         }
       } catch (error) {
         report.push({
-          phone: user.phone || 'unknown',
+          phone: rawUser.phone || 'unknown',
           status: "failed",
           reason: error.message,
         });
