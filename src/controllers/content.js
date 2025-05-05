@@ -1,13 +1,24 @@
-export const htmlContent = (user) => { 
-  let headerImage = '';
-  if (user.userType === 'buyer') {
-    headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Buyer%20Header.png';
-  } else if (user.userType === 'member') {
-    headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Member%20Header.png';
-  } else if (user.userType === 'agent') {
-    headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Agent%20Header.png';
-  } else if (user.userType === 'exhibitor') {
-    headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Owner%20Header.png';
+export const htmlContent = (user) => {
+  let headerImage = "";
+  if (user.userType === "buyer") {
+    headerImage =
+      "https://indusglobal.s3.ap-south-1.amazonaws.com/Buyer%20Header.png";
+  } else if (user.userType === "member") {
+    headerImage =
+      "https://indusglobal.s3.ap-south-1.amazonaws.com/Member%20Header.png";
+  } else if (user.userType === "agent") {
+    headerImage =
+      "https://indusglobal.s3.ap-south-1.amazonaws.com/Agent%20Header.png";
+  } else if (user.userType === "exhibitor") {
+    headerImage =
+      "https://indusglobal.s3.ap-south-1.amazonaws.com/Owner%20Header.png";
+  }
+
+  let idDive = "";
+  if (user.userType === "buyer") {
+    idDive = `<div><span class="bold">ID :</span> ${user.id}</div>`;
+  } else if (user.userType === "agent") {
+    idDive = `<div><span class="bold">ID :</span> ${user.id}</div>`;
   }
 
   return `<!DOCTYPE html>
@@ -55,9 +66,9 @@ export const htmlContent = (user) => {
       </div>
 
       <div class="info">
-        <div><span class="bold">ID :</span> ${user.id}</div>
+         ${idDive}
         <div><span class="bold">Name :</span> ${user.name}</div>
-        <div><span class="bold">Comp :</span> ${user.company || ''}</div>
+        <div><span class="bold">Comp :</span> ${user.company || ""}</div>
         <div><span class="bold">City :</span> ${user.city}</div>
       </div>
 
