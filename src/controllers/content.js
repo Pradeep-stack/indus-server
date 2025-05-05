@@ -1,12 +1,12 @@
 export const htmlContent = (user) => { 
   let headerImage = '';
-  if (user.userType === 'user') {
+  if (user.userType === 'buyer') {
     headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Buyer%20Header.png';
   } else if (user.userType === 'member') {
     headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Member%20Header.png';
   } else if (user.userType === 'agent') {
     headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Agent%20Header.png';
-  } else if (user.userType === 'owner') {
+  } else if (user.userType === 'exhibitor') {
     headerImage = 'https://indusglobal.s3.ap-south-1.amazonaws.com/Owner%20Header.png';
   }
 
