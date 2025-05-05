@@ -158,7 +158,10 @@ const importExpoUsers = asyncHandler(async (req, res) => {
 
   try {
     // Launch browser once for all users
-    browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
 
     const stream = Readable.from(req.file.buffer);
     const csvStream = csv();
