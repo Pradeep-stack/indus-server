@@ -97,9 +97,9 @@ const generateUniqueId = async () => {
 //               await page.setContent(html, { waitUntil: "networkidle0" });
 
 //               await page.setViewport({
-//                 width: 350, 
+//                 width: 350,
 //                 height: 500,
-//                 deviceScaleFactor: 2, 
+//                 deviceScaleFactor: 2,
 //               });
 
 //               const imageBuffer = await page.screenshot({
@@ -160,19 +160,20 @@ const importExpoUsers = asyncHandler(async (req, res) => {
     // Launch browser once for all users
     browser = await puppeteer.launch({
       headless: "new",
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const stream = Readable.from(req.file.buffer);
     const csvStream = csv({
-      trim: true,               // Trim whitespace from values
-      skipEmptyLines: true,     // Skip empty lines
-      columns: true,            // Use first row as headers
+      trim: true, // Trim whitespace from values
+      skipEmptyLines: true, // Skip empty lines
+      columns: true, // Use first row as headers
       skipRecordsWithEmptyValues: true, // Skip records with empty values
-      cast: (value, context) => { // Convert empty strings to undefined
-        if (context.column === 'phone') return value; // Keep phone as string
-        return value === '' ? undefined : value;
-      }
+      cast: (value, context) => {
+        // Convert empty strings to undefined
+        if (context.column === "phone") return value; // Keep phone as string
+        return value === "" ? undefined : value;
+      },
     });
 
     let batch = [];
@@ -184,18 +185,21 @@ const importExpoUsers = asyncHandler(async (req, res) => {
         const user = {};
         Object.entries(rawUser).forEach(([key, value]) => {
           const normalizedKey = key.trim().toLowerCase();
-          user[normalizedKey] = typeof value === 'string' ? value.trim() : value;
+          user[normalizedKey] =
+            typeof value === "string" ? value.trim() : value;
         });
 
         // Debug log to see parsed data
-        console.log('Processing user:', user);
+        console.log("Processing user:", user);
 
         // Validate required fields
-        const requiredFields = ['name', 'phone', 'city', 'state', 'usertype'];
-        const missingFields = requiredFields.filter(field => !user[field]);
-        
+        const requiredFields = ["name", "phone", "city", "state", "usertype"];
+        const missingFields = requiredFields.filter((field) => !user[field]);
+
         if (missingFields.length > 0) {
-          throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+          throw new Error(
+            `Missing required fields: ${missingFields.join(", ")}`
+          );
         }
 
         // Validate phone format
@@ -205,13 +209,19 @@ const importExpoUsers = asyncHandler(async (req, res) => {
 
         // Check for existing user
         const existingUser = await ExpoUser.findOne({ phone: user.phone });
-        if (existingUser && existingUser.userType !== "exhibitor" || user.usertype !== "exhibitor") {
+        if (
+          existingUser &&
+          (existingUser.userType !== "exhibitor" ||
+            user.usertype !== "exhibitor")
+        ) {
           throw new Error("Phone number already exists");
         }
 
         // Generate ID and hash password
         const id = await generateUniqueId();
-        const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : undefined;
+        const hashedPassword = user.password
+          ? await bcrypt.hash(user.password, 10)
+          : undefined;
 
         // Create user object with proper field mapping
         const userData = {
@@ -221,11 +231,11 @@ const importExpoUsers = asyncHandler(async (req, res) => {
           phone: user.phone,
           city: user.city,
           state: user.state,
-          profile_pic: user.profile_pic || user['profile pic'],
+          profile_pic: user.profile_pic || user["profile pic"],
           userType: user.usertype || user.userType, // Handle different cases
           email: user.email,
           password: hashedPassword,
-          stall_number: user.stall_number || user['stall number'],
+          stall_number: user.stall_number || user["stall number"],
         };
 
         batch.push(userData);
@@ -237,7 +247,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
         }
       } catch (error) {
         report.push({
-          phone: rawUser.phone || 'unknown',
+          phone: rawUser.phone || "unknown",
           status: "failed",
           reason: error.message,
         });
@@ -269,7 +279,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
 // Helper function to process a batch of users
 async function processBatch(users, report, browser) {
   const page = await browser.newPage();
-  
+
   try {
     for (const userData of users) {
       try {
@@ -462,8 +472,8 @@ const registerExpoUser = asyncHandler(async (req, res) => {
 
       try {
         const browser = await puppeteer.launch({
-          headless: "new", 
-          args: ["--no-sandbox", "--disable-setuid-sandbox"]
+          headless: "new",
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
         });
         const page = await browser.newPage();
 
