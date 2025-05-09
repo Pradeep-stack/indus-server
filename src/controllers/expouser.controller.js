@@ -205,7 +205,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
 
         // Check for existing user
         const existingUser = await ExpoUser.findOne({ phone: user.phone });
-        if (existingUser && existingUser.userType !== "exhibitor") {
+        if (existingUser && existingUser.userType !== "exhibitor" || user.userType !== "exhibitor") {
           throw new Error("Phone number already exists");
         }
 
