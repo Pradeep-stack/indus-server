@@ -275,7 +275,7 @@ async function processBatch(users, report, browser) {
       try {
         const createdUser = await ExpoUser.create(userData);
 
-        if (createdUser) {
+        if (createdUser && userData.userType !== "exhibitor") {
           const html = htmlContent(createdUser);
           await page.setContent(html, { waitUntil: "networkidle0" });
           await page.setViewport({
@@ -303,6 +303,8 @@ async function processBatch(users, report, browser) {
           }
 
           report.push({ phone: userData.phone, status: "success" });
+        }else{
+           await createdUser.save();
         }
       } catch (error) {
         report.push({

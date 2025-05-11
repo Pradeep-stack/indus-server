@@ -29,7 +29,7 @@ const expoUserSchema = new Schema(
     },
     userType: {
       type: String,
-      enum: ["agent", "buyer", "exhibitor", "member", "admin", "superadmin"],
+      enum: ["agent", "buyer", "exhibitor", "member", "staff", "admin", "superadmin"],
       required: true,
     },
     email: {
