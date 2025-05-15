@@ -208,7 +208,7 @@ const importExpoUsers = asyncHandler(async (req, res) => {
   const existingUser = await ExpoUser.findOne({ phone: user.phone, userType: user.usertype });
 
 if (existingUser) {
-  return res.status(400).json({ message: "Phone number already exists for this user type" });
+  throw new Error(`Phone number already exists for user type ${user.usertype}`);
 }
         // Generate ID and hash password
         const id = await generateUniqueId();
