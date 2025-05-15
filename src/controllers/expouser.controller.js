@@ -393,13 +393,13 @@ const registerExpoUser = asyncHandler(async (req, res) => {
     const id = await generateUniqueId();
 
     // Check if the phone number already exists
-    const existingUser = await ExpoUser.findOne({ phone });
+  const existingUser = await ExpoUser.findOne({ phone, userType });
 
-    if (existingUser && existingUser.userType !== userType) {
-      return res
-        .status(400)
-        .json(new ApiError(400, "Phone number already exists"));
-    }
+if (existingUser) {
+  return res.status(400).json({ message: "Phone number already exists for this user type" });
+}
+
+
 
     // Create a new user instance
     const newUser = new ExpoUser({
