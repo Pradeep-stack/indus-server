@@ -395,7 +395,7 @@ const registerExpoUser = asyncHandler(async (req, res) => {
     // Check if the phone number already exists
     const existingUser = await ExpoUser.findOne({ phone });
 
-    if (existingUser) {
+    if (existingUser && existingUser.userType !== "exhibitor") {
       return res
         .status(400)
         .json(new ApiError(400, "Phone number already exists"));
