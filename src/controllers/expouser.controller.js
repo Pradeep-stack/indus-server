@@ -543,9 +543,12 @@ const getUserById = asyncHandler(async (req, res) => {
 // Update User by Phone
 const updateUserById = asyncHandler(async (req, res) => {
   const phone = req.params.phone;
-  const updates = req.body;
+  const { userType} = req.body;
+  const filds ={
+    isWatched : true
+  }
 
-  const user = await ExpoUser.findOneAndUpdate({ phone }, updates, {
+  const user = await ExpoUser.findOneAndUpdate({ phone,  userType : userType}, filds, {
     new: true, // Return the updated document
     runValidators: true, // Enforce schema validation on update
   });
