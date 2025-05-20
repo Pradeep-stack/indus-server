@@ -6,7 +6,79 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { nanoid } from "nanoid";
+import { OTP } from "../models/otp.modal.js";
+import crypto from "crypto";
+import  sendOtpEmail  from "../utils/sendMail.js";
 
+// Generate random 6-digit OTP
+const generateOTP = () => crypto.randomInt(100000, 999999).toString();
+
+const sendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    throw new ApiError(400, "Phone number is required");
+  }
+  // Delete existing OTPs
+  await OTP.deleteMany({ email });
+
+  const otp = generateOTP();
+  await OTP.create({ email, otp });
+
+  // Send OTP via SMS or email
+   const result = await sendOtpEmail(email, otp);
+     if (result.success) {
+    res
+      .status(200)
+      .json({ message: "OTP email sent successfully", data: result.data });
+  } else {
+    res
+      .status(500)
+      .json({ message: "Failed to send OTP email", error: result.error });
+  }
+});
+
+const verifyOTP = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    throw new ApiError(400, "Email and OTP are required");
+  }
+
+  const otpRecord = await OTP.findOne({ email });
+  if (!otpRecord || otpRecord.otp !== otp) {
+    throw new ApiError(400, "Invalid OTP or OTP expired");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, "User not found. Please register first.");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "User logged in successfully via OTP"
+      )
+    );
+});
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -103,13 +175,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  // req body -> data
-  // username or email
-  //find the user
-  //password check
-  //access and referesh token
-  //send cookie
-
+ 
   const { email, password } = req.body;
   console.log(email);
 
@@ -655,4 +721,6 @@ export {
   deleteUser,
   updateUser,
   getUserById,
+  sendOTP,
+  verifyOTP,
 };

@@ -53,6 +53,8 @@ const userSchema = new Schema(
     },
     phone: {
       type: Number, // cloudinary url
+      // unique: true,
+      // sparse: true,
       // required: true,
     },
     user_type: {

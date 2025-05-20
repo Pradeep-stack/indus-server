@@ -17,7 +17,9 @@ import {
     deleteUser,
     updateUser,
     getUserById,
-    getUsersReferredByMe
+    getUsersReferredByMe,
+    sendOTP,
+  verifyOTP
 } from "../controllers/user.controller.js";
 import { uploadSingle, uploadMultiple } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -27,6 +29,8 @@ const router = Router()
 
 router.route("/register").post(registerUser )
 router.route("/login").post(loginUser)
+router.route("/send-otp").post(sendOTP)
+router.route("/verify-otp").post(verifyOTP)
 router.route("/get-all-user").get(getAllUsers)// modify this api for the get associat for the associat
 router.route("/get-referral/:referral_code").get(getUsersReferredByMe)
 router.route("/get-admin").get(getAllCenter)
