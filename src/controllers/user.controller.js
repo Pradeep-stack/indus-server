@@ -11,7 +11,7 @@ import crypto from "crypto";
 import  sendOtpEmail  from "../utils/sendMail.js";
 
 // Generate random 6-digit OTP
-const generateOTP = () => crypto.randomInt(100000, 999999).toString();
+const generateOTP = () => crypto.randomInt(1000, 9999).toString();
 
 const sendOTP = asyncHandler(async (req, res) => {
   const { email } = req.body;
