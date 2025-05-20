@@ -42,17 +42,17 @@ const verifyOTP = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
-    throw new ApiError(400, "Email and OTP are required");
+    return res.status(400).json({ success: false, message: "Email and OTP are required" });
   }
 
   const otpRecord = await OTP.findOne({ email });
   if (!otpRecord || otpRecord.otp !== otp) {
-    throw new ApiError(400, "Invalid OTP or OTP expired");
+    return res.status(400).json({ success: false, message: "Invalid OTP or OTP expired" });
   }
 
   const user = await User.findOne({ email });
   if (!user) {
-    throw new ApiError(404, "User not found. Please register first.");
+    return res.status(400).json({ success: false, message: "User not found. Please register first" });
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
@@ -67,18 +67,17 @@ const verifyOTP = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        {
-          user: loggedInUser,
-          accessToken,
-          refreshToken,
-        },
-        "User logged in successfully via OTP"
-      )
-    );
+    .json({
+      success: true,
+      message: "User logged in successfully via OTP",
+      data: {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+      },
+    });
 });
+
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
