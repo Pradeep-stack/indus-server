@@ -13,7 +13,7 @@ const router = Router()
 router.route("/register").post(registerExpoUser )
 router.route("/allusers").get(getAllExpoUsers)
 router.route("/get-user/:phone").get(getUserById)
-router.route("/update-user/:phone").put(updateUserById)
+router.route("/update-user/:phone").patch(updateUserById)
 router.route("/delete-user/:phone").delete(deleteUserById)
 router.post('/import', upload.single('file'), importExpoUsers);
 

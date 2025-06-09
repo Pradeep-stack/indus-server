@@ -543,9 +543,10 @@ const getUserById = asyncHandler(async (req, res) => {
 // Update User by Phone
 const updateUserById = asyncHandler(async (req, res) => {
   const phone = req.params.phone;
-  const { userType} = req.body;
+  const { userType , stall_number} = req.body;
   const filds ={
-    isWatched : true
+    isWatched : true,
+    stall_number
   }
 
   const user = await ExpoUser.findOneAndUpdate({ phone,  userType : userType}, filds, {
