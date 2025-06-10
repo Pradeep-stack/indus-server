@@ -238,6 +238,8 @@ const importExpoUsers = asyncHandler(async (req, res) => {
           email: user.email,
           password: hashedPassword,
           stall_number: user.stall_number || user["stall number"],
+          stall_size: user.stall_size || user["stall size"],
+          isWatched: user.isWatched || false, // Default to false if not provided
         };
 
         batch.push(userData);
@@ -556,11 +558,12 @@ const getUserById = asyncHandler(async (req, res) => {
 // Update User by Phone
 const updateUserById = asyncHandler(async (req, res) => {
   const phone = req.params.phone;
-  const { userType, stall_number } = req.body;
+  const { userType, stall_number, stall_size } = req.body;
   const filds = stall_number
     ? {
         isWatched: false,
         stall_number,
+        stall_size,
       }
     : {
         isWatched: true,
