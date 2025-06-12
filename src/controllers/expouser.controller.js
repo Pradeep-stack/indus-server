@@ -565,7 +565,7 @@ const updateUserById = asyncHandler(async (req, res) => {
         stall_number,
         stall_size,
         company,
-        mobile,
+        phone:mobile,
       }
     : {
         isWatched: true,
