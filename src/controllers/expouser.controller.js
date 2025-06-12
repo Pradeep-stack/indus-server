@@ -558,12 +558,14 @@ const getUserById = asyncHandler(async (req, res) => {
 // Update User by Phone
 const updateUserById = asyncHandler(async (req, res) => {
   const phone = req.params.phone;
-  const { userType, stall_number, stall_size } = req.body;
+  const { userType, stall_number, stall_size, company, mobile } = req.body;
   const filds = stall_number
     ? {
         isWatched: false,
         stall_number,
         stall_size,
+        company,
+        mobile,
       }
     : {
         isWatched: true,
