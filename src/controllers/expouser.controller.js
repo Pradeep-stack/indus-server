@@ -219,6 +219,12 @@ const importExpoUsers = asyncHandler(async (req, res) => {
             `Phone number already exists for user type ${user.usertype}`
           );
         }
+        // Check if the stall_number already exists
+        const existingStall = await ExpoUser.findOne({ stall_number:user.stall_number });
+
+        if (existingStall) {
+          throw new Error(`Stall number ${user.stall_number} already exists`);
+        }
         // Generate ID and hash password
         const id = await generateUniqueId();
         const hashedPassword = user.password
@@ -415,7 +421,7 @@ const registerExpoUser = asyncHandler(async (req, res) => {
         .json({ message: "Phone number already exists for this user type" });
     }
 
-    // Create a new user instance
+    // Create a new user instance with the provided data
     const newUser = new ExpoUser({
       id,
       name,
@@ -559,32 +565,57 @@ const getUserById = asyncHandler(async (req, res) => {
 const updateUserById = asyncHandler(async (req, res) => {
   const phone = req.params.phone;
   const { userType, stall_number, stall_size, company, mobile } = req.body;
-  const filds = stall_number
-    ? {
-        isWatched: false,
-        stall_number,
-        stall_size,
-        company,
-        phone:mobile,
-      }
-    : {
-        isWatched: true,
-      };
 
-  const user = await ExpoUser.findOneAndUpdate(
-    { phone, userType: userType },
-    filds,
-    {
-      new: true, // Return the updated document
-      runValidators: true, // Enforce schema validation on update
-    }
-  );
-
-  if (!user) {
+  // Find the current user
+  const currentUser = await ExpoUser.findOne({ phone, userType });
+  if (!currentUser) {
     return res.status(400).json(new ApiError(400, "User not found"));
   }
 
-  return res.json(new ApiResponse(200, user, "User updated successfully"));
+  // Check if new stall_number exists for another user
+  if (stall_number) {
+    const existingStall = await ExpoUser.findOne({
+      stall_number,
+      _id: { $ne: currentUser._id },
+    });
+
+    if (existingStall) {
+      return res.status(400).json(new ApiError(400, "Stall number already in use"));
+    }
+  }
+
+  // Check if new phone (mobile) exists for another user
+  if (mobile) {
+    const existingPhone = await ExpoUser.findOne({
+      phone: mobile,
+      _id: { $ne: currentUser._id },
+    });
+
+    if (existingPhone) {
+      return res.status(400).json(new ApiError(400, "Phone number already in use"));
+    }
+  }
+
+  // Prepare only the fields that need to be updated
+  const updateFields = {
+    ...(stall_number && { stall_number }),
+    ...(stall_size && { stall_size }),
+    ...(company && { company }),
+    ...(mobile && { phone: mobile }),
+    isWatched: !!stall_number ? false : true,
+  };
+
+  // Update and return updated user
+  const updatedUser = await ExpoUser.findOneAndUpdate(
+    { _id: currentUser._id },
+    updateFields,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  return res.json(new ApiResponse(200, updatedUser, "User updated successfully"));
 });
 
 // Delete User by Phone
