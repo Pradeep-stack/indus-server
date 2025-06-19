@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
-import { ExpoUser } from "../models/expouser.modal.js";
+import { ExpoUser, ExpoWebsite } from "../models/expouser.modal.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import csv from "csv-parser";
 import { Readable } from "stream";
@@ -220,7 +220,9 @@ const importExpoUsers = asyncHandler(async (req, res) => {
           );
         }
         // Check if the stall_number already exists
-        const existingStall = await ExpoUser.findOne({ stall_number:user.stall_number });
+        const existingStall = await ExpoUser.findOne({
+          stall_number: user.stall_number,
+        });
 
         if (existingStall) {
           throw new Error(`Stall number ${user.stall_number} already exists`);
@@ -580,7 +582,9 @@ const updateUserById = asyncHandler(async (req, res) => {
     });
 
     if (existingStall) {
-      return res.status(400).json(new ApiError(400, "Stall number already in use"));
+      return res
+        .status(400)
+        .json(new ApiError(400, "Stall number already in use"));
     }
   }
 
@@ -592,7 +596,9 @@ const updateUserById = asyncHandler(async (req, res) => {
     });
 
     if (existingPhone) {
-      return res.status(400).json(new ApiError(400, "Phone number already in use"));
+      return res
+        .status(400)
+        .json(new ApiError(400, "Phone number already in use"));
     }
   }
 
@@ -615,7 +621,9 @@ const updateUserById = asyncHandler(async (req, res) => {
     }
   );
 
-  return res.json(new ApiResponse(200, updatedUser, "User updated successfully"));
+  return res.json(
+    new ApiResponse(200, updatedUser, "User updated successfully")
+  );
 });
 
 // Delete User by Phone
@@ -631,6 +639,50 @@ const deleteUserById = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
+const addWebsite = asyncHandler(async (req, res) => {
+  const { websiteUrl, activateLink } = req.body;
+  try {
+    const newWebsite = new ExpoWebsite({
+      websiteUrl,
+      activateLink,
+    });
+
+    const createdWebsite = await newWebsite.save();
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, createdWebsite, "Website added successfully"));
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500, null, error.message));
+  }
+});
+
+const getWebsite = asyncHandler(async (req, res) => {
+  const website = await ExpoWebsite.findOne();
+  if (!website) {
+    return res.status(404).json(new ApiError(404, "Website not found"));
+  }
+  return res.json(new ApiResponse(200, website, "Website retrieved successfully"));
+});
+
+const updateWebsite = asyncHandler(async (req, res) => {
+  const { websiteUrl, activateLink } = req.body;
+
+  const updatedWebsite = await ExpoWebsite.findOneAndUpdate(
+    {},
+    { websiteUrl, activateLink },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedWebsite) {
+    return res.status(404).json(new ApiError(404, "Website not found"));
+  }
+
+  return res.json(
+    new ApiResponse(200, updatedWebsite, "Website updated successfully")
+  );
+});
+
 export {
   registerExpoUser,
   getAllExpoUsers,
@@ -638,4 +690,7 @@ export {
   updateUserById,
   deleteUserById,
   importExpoUsers,
+  addWebsite,
+  getWebsite,
+  updateWebsite
 };

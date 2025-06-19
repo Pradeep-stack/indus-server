@@ -29,7 +29,15 @@ const expoUserSchema = new Schema(
     },
     userType: {
       type: String,
-      enum: ["agent", "buyer", "exhibitor", "member", "staff", "admin", "superadmin"],
+      enum: [
+        "agent",
+        "buyer",
+        "exhibitor",
+        "member",
+        "staff",
+        "admin",
+        "superadmin",
+      ],
       required: true,
     },
     email: {
@@ -44,15 +52,30 @@ const expoUserSchema = new Schema(
     stall_size: {
       type: Number,
     },
-    isWatched :{
+    isWatched: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    badge_image_url: { type: String }
+    badge_image_url: { type: String },
   },
   {
     timestamps: true,
   }
 );
 
+const websiteSchema = new Schema(
+  {
+    websiteUrl: {
+      type: String,
+      required: true,
+      default: "https://surat-dreams.vercel.app/find-stall",
+    },
+    activateLink: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const ExpoWebsite = mongoose.model("ExpoWebsite", websiteSchema);
 export const ExpoUser = mongoose.model("ExpoUser", expoUserSchema);
