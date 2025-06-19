@@ -22,6 +22,6 @@ router.route("/delete-user/:phone").delete(deleteUserById);
 router.post("/import", upload.single("file"), importExpoUsers);
 router.post("/add-website", addWebsite);
 router.get("/get-website", getWebsite);
-router.patch("/update-website", updateWebsite);
+router.patch("/update-website-link", updateWebsite);
 
 export default router;
