@@ -8,14 +8,14 @@ import mongoose from "mongoose";
 import { nanoid } from "nanoid";
 import { OTP } from "../models/otp.modal.js";
 import crypto from "crypto";
-import  sendOtpEmail  from "../utils/sendMail.js";
+import sendOtpEmail from "../utils/sendMail.js";
 
 // Generate random 6-digit OTP
 const generateOTP = () => crypto.randomInt(1000, 9999).toString();
 
 const sendOTP = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  
+
   if (!email) {
     throw new ApiError(400, "Phone number is required");
   }
@@ -26,8 +26,8 @@ const sendOTP = asyncHandler(async (req, res) => {
   await OTP.create({ email, otp });
 
   // Send OTP via SMS or email
-   const result = await sendOtpEmail(email, otp);
-     if (result.success) {
+  const result = await sendOtpEmail(email, otp);
+  if (result.success) {
     res
       .status(200)
       .json({ message: "OTP email sent successfully", data: result.data });
@@ -121,11 +121,11 @@ const registerUser = asyncHandler(async (req, res) => {
       .status(409)
       .json(new ApiError(409, "User with email already exists"));
   }
-  const innp= region==="india"?"IN":"NP";
-  
-  const newReferralCode =innp + nanoid(10);
+  const innp = region === "india" ? "IN" : "NP";
 
-  const user_type =  "User";
+  const newReferralCode = innp + nanoid(10);
+
+  const user_type = "User";
 
   const user = new User({
     username,
@@ -173,8 +173,134 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
+// upgrade user with package 
+const upgradeUser = asyncHandler(async (req, res) => {
+  try {
+    const {
+      userId,
+      packagePlan,
+      sponserBy,
+      underChild,
+      position,
+    } = req.body;
+
+    if (!sponserBy && !position) {
+      return res
+        .status(409)
+        .json({ message: "Sponsor Code and Position are required" });
+    }
+
+
+    const existingUser = await User.findById({ _id: userId });
+
+    let user_type;
+
+    if (packagePlan === "package-1") {
+      user_type = "Admin"
+    }
+    if (packagePlan === "package-2") {
+      user_type = "Professional"
+    }
+    if (packagePlan === "package-3") {
+      user_type = "Corporate"
+    }
+
+    existingUser.user_type = user_type;
+    
+    const sponsor = await User.findOne({ sponser_code: sponserBy });
+    if (!sponsor) {
+      return res.status(404).json({ message: "Sponsor not found" });
+    }
+
+    let parent = underChild
+      ? await User.findOne({ sponser_code: underChild })
+      : sponsor;
+    if (!parent) {
+      return res.status(404).json({ message: "Parent user not found" });
+    }
+
+
+    if (position === "left") {
+      if (!parent.leftChild) {
+        parent.leftChild = existingUser._id;
+        existingUser.position = position;
+      } else {
+        if (!parent.rightChild) {
+          parent.rightChild = existingUser._id;
+          existingUser.position = "right";
+        } else {
+          let nextParent = await findDeepestAvailable(parent.leftChild, "left");
+          if (nextParent) {
+            if (!nextParent.leftChild) {
+              nextParent.leftChild = existingUser._id;
+              existingUser.position = "left";
+            } else if (!nextParent.rightChild) {
+              nextParent.rightChild = existingUser._id;
+              existingUser.position = "right";
+            }
+            await nextParent.save();
+          } else {
+            throw new Error("No available position in left branch");
+          }
+        }
+      }
+    } else if (position === "right") {
+      if (!parent.rightChild) {
+        parent.rightChild = existingUser._id;
+        existingUser.position = position;
+      } else {
+        if (!parent.leftChild) {
+          parent.leftChild = existingUser._id;
+          existingUser.position = "left";
+        } else {
+          let nextParent = await findDeepestAvailable(
+            parent.rightChild,
+            "right"
+          );
+          if (nextParent) {
+            if (!nextParent.rightChild) {
+              nextParent.rightChild = existingUser._id;
+              existingUser.position = "right";
+            } else if (!nextParent.leftChild) {
+              nextParent.leftChild = existingUser._id;
+              existingUser.position = "left";
+            }
+            await nextParent.save();
+          } else {
+            throw new Error("No available position in right branch");
+          }
+        }
+      }
+    }
+
+    await existingUser.save();
+    await parent.save();
+
+    await sendMailToAdmin(fullName, newReferralCode);
+    await sendMailToUser(
+      email, password, fullName, newReferralCode
+    )
+
+    await User.findByIdAndUpdate(
+      sponsor._id,
+      { $push: { directReferrals: existingUser._id } },
+      { new: true }
+    );
+
+    // await updateAutoPullEarnings(sponsor._id);
+
+    res
+      .status(201)
+      .json({ user: existingUser, message: "User registered successfully" });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong while registering the user" });
+  }
+});
 const loginUser = asyncHandler(async (req, res) => {
- 
+
   const { email, password } = req.body;
   console.log(email);
 
