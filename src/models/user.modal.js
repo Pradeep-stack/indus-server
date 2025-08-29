@@ -59,7 +59,7 @@ const userSchema = new Schema(
     },
     user_type: {
       type: String,
-      enum: ["Super_Admin", "Admin", "User"],
+      enum: ["Super_Admin", "Admin", "User", "Professional", "Corporate"],
     },
     password: {
       type: String,
@@ -68,7 +68,20 @@ const userSchema = new Schema(
     referral_code: {
       type: String,
     },
+    position: {
+      type: String,
+      // enum: ["left", "right"],
+    },
     referredBy: { type: String },
+    leftChild: { type: Schema.Types.ObjectId, ref: "User" },
+    rightChild: { type: Schema.Types.ObjectId, ref: "User" },
+    directReferrals: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    financials: {
+      totalIncome: { type: Number, default: 0 },
+      totalWithdrawal: { type: Number, default: 0 },
+      totalBalance: { type: Number, default: 0 },
+      totalReferrals: { type: Number, default: 0 },
+    },
     points: { type: Number, default: 0 },
     refreshToken: {
       type: String,

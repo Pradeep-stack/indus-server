@@ -37,6 +37,7 @@ const expoUserSchema = new Schema(
         "staff",
         "admin",
         "superadmin",
+        "owner"
       ],
       required: true,
     },
