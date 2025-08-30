@@ -1,25 +1,26 @@
 import { Router } from "express";
-import { 
-    loginUser, 
-    logoutUser, 
-    registerUser, 
-    refreshAccessToken, 
-    changeCurrentPassword, 
-    getCurrentUser, 
-    updateUserAvatar, 
-    updateUserCoverImage, 
-    getUserChannelProfile, 
-    getWatchHistory, 
-    updateAccountDetails,
-    getAllUsers,
-    getAllCenter,
-    getAllParent,
-    deleteUser,
-    updateUser,
-    getUserById,
-    getUsersReferredByMe,
-    sendOTP,
-  verifyOTP
+import {
+  loginUser,
+  logoutUser,
+  registerUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateUserAvatar,
+  updateUserCoverImage,
+  getUserChannelProfile,
+  getWatchHistory,
+  updateAccountDetails,
+  getAllUsers,
+  getAllCenter,
+  getAllParent,
+  deleteUser,
+  updateUser,
+  getUserById,
+  getUsersReferredByMe,
+  sendOTP,
+  verifyOTP,
+  upgradeUser,
 } from "../controllers/user.controller.js";
 import { uploadSingle, uploadMultiple } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -27,7 +28,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
-router.route("/register").post(registerUser )
+router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
 router.route("/send-otp").post(sendOTP)
 router.route("/verify-otp").post(verifyOTP)
@@ -39,9 +40,8 @@ router.route("/delete-user/:id").delete(deleteUser)
 router.route("/update-user/:id").patch(updateUser)
 router.route("/user-by-id/:id").get(getUserById)
 
-
 //secured routes
-router.route("/logout").post(verifyJWT,  logoutUser)
+router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)
 router.route("/change-password").post(verifyJWT, changeCurrentPassword)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
@@ -51,5 +51,7 @@ router.route("/update-account").patch(verifyJWT, updateAccountDetails)
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile)
 router.route("/history").get(verifyJWT, getWatchHistory)
 
+// MLM routes
+router.route("/upgrade-user").post( upgradeUser)
 
 export default router
