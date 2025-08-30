@@ -174,6 +174,21 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // upgrade user with package 
+// Helper function to find the deepest available parent in a branch
+async function findDeepestAvailable(userId, branch) {
+  let current = await User.findById(userId);
+  while (current) {
+    if (branch === "left") {
+      if (!current.leftChild) return current;
+      current = await User.findById(current.leftChild);
+    } else {
+      if (!current.rightChild) return current;
+      current = await User.findById(current.rightChild);
+    }
+  }
+  return null;
+}
+
 const upgradeUser = asyncHandler(async (req, res) => {
   try {
     const {
@@ -184,121 +199,133 @@ const upgradeUser = asyncHandler(async (req, res) => {
       position,
     } = req.body;
 
-    if (!sponserBy && !position) {
-      return res
-        .status(409)
-        .json({ message: "Sponsor Code and Position are required" });
+    // Correct validation: require both fields
+    if (!sponserBy || !position) {
+      return res.status(409).json({ message: "Sponsor Code and Position are required" });
     }
 
+    // Find user by id
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    const existingUser = await User.findById({ _id: userId });
-
+    // Validate packagePlan
     let user_type;
-
     if (packagePlan === "package-1") {
-      user_type = "Admin"
+      user_type = "Admin";
+    } else if (packagePlan === "package-2") {
+      user_type = "Professional";
+    } else if (packagePlan === "package-3") {
+      user_type = "Corporate";
+    } else {
+      return res.status(400).json({ message: "Invalid package plan" });
     }
-    if (packagePlan === "package-2") {
-      user_type = "Professional"
-    }
-    if (packagePlan === "package-3") {
-      user_type = "Corporate"
-    }
-
     existingUser.user_type = user_type;
-    
-    const sponsor = await User.findOne({ sponser_code: sponserBy });
+
+    // Find sponsor
+    const sponsor = await User.findOne({ referral_code: sponserBy });
     if (!sponsor) {
       return res.status(404).json({ message: "Sponsor not found" });
     }
 
+    // Find parent
     let parent = underChild
-      ? await User.findOne({ sponser_code: underChild })
+      ? await User.findOne({ referral_code: underChild })
       : sponsor;
     if (!parent) {
       return res.status(404).json({ message: "Parent user not found" });
     }
 
+    // Prevent duplicate child assignment
+    if (parent.leftChild === existingUser._id || parent.rightChild === existingUser._id) {
+      return res.status(409).json({ message: "User is already assigned as a child to this parent" });
+    }
 
     if (position === "left") {
       if (!parent.leftChild) {
         parent.leftChild = existingUser._id;
         existingUser.position = position;
       } else {
-        if (!parent.rightChild) {
-          parent.rightChild = existingUser._id;
-          existingUser.position = "right";
-        } else {
-          let nextParent = await findDeepestAvailable(parent.leftChild, "left");
-          if (nextParent) {
-            if (!nextParent.leftChild) {
-              nextParent.leftChild = existingUser._id;
-              existingUser.position = "left";
-            } else if (!nextParent.rightChild) {
-              nextParent.rightChild = existingUser._id;
-              existingUser.position = "right";
-            }
-            await nextParent.save();
-          } else {
-            throw new Error("No available position in left branch");
-          }
-        }
+        return res.status(409).json({ message: "User is already assigned as a child to this parent" });
       }
     } else if (position === "right") {
       if (!parent.rightChild) {
         parent.rightChild = existingUser._id;
         existingUser.position = position;
       } else {
-        if (!parent.leftChild) {
-          parent.leftChild = existingUser._id;
-          existingUser.position = "left";
-        } else {
-          let nextParent = await findDeepestAvailable(
-            parent.rightChild,
-            "right"
-          );
-          if (nextParent) {
-            if (!nextParent.rightChild) {
-              nextParent.rightChild = existingUser._id;
-              existingUser.position = "right";
-            } else if (!nextParent.leftChild) {
-              nextParent.leftChild = existingUser._id;
-              existingUser.position = "left";
-            }
-            await nextParent.save();
-          } else {
-            throw new Error("No available position in right branch");
-          }
-        }
+        return res.status(409).json({ message: "User is already assigned as a child to this parent" });
       }
     }
 
-    await existingUser.save();
-    await parent.save();
+    // Assign user to parent's left or right
+    // if (position === "left") {
+    //   if (!parent.leftChild) {
+    //     parent.leftChild = existingUser._id;
+    //     existingUser.position = position;
+      //   } else if (!parent.rightChild) {
+      //     parent.rightChild = existingUser._id;
+      //     existingUser.position = "right";
+      //   } else {
+      //     let nextParent = await findDeepestAvailable(parent.leftChild, "left");
+      //     if (nextParent) {
+      //       if (!nextParent.leftChild) {
+      //         nextParent.leftChild = existingUser._id;
+      //         existingUser.position = "left";
+      //       } else if (!nextParent.rightChild) {
+      //         nextParent.rightChild = existingUser._id;
+      //         existingUser.position = "right";
+      //       }
+      //       await nextParent.save();
+      //     } else {
+      //       return res.status(409).json({ message: "No available position in left branch" });
+      //     }
+      //   }
+      // }
 
-    await sendMailToAdmin(fullName, newReferralCode);
-    await sendMailToUser(
-      email, password, fullName, newReferralCode
-    )
+      // else if (position === "right") {
+      //   if (!parent.rightChild) {
+      //     parent.rightChild = existingUser._id;
+      //     existingUser.position = position;
+      //   } else if (!parent.leftChild) {
+      //     parent.leftChild = existingUser._id;
+      //     existingUser.position = "left";
+      //   } else {
+      //     let nextParent = await findDeepestAvailable(parent.rightChild, "right");
+      //     if (nextParent) {
+      //       if (!nextParent.rightChild) {
+      //         nextParent.rightChild = existingUser._id;
+      //         existingUser.position = "right";
+      //       } else if (!nextParent.leftChild) {
+      //         nextParent.leftChild = existingUser._id;
+      //         existingUser.position = "left";
+      //       }
+      //       await nextParent.save();
+      //     } else {
+      //       return res.status(409).json({ message: "No available position in right branch" });
+      //     }
+      //   }
+      // } else {
+      //   return res.status(400).json({ message: "Invalid position value" });
+      // }
 
-    await User.findByIdAndUpdate(
-      sponsor._id,
-      { $push: { directReferrals: existingUser._id } },
-      { new: true }
-    );
+      await existingUser.save();
+      await parent.save();
 
-    // await updateAutoPullEarnings(sponsor._id);
+      // Add direct referral
+      await User.findByIdAndUpdate(
+        sponsor._id,
+        { $addToSet: { directReferrals: existingUser._id } },
+        { new: true }
+      );
 
-    res
-      .status(201)
-      .json({ user: existingUser, message: "User registered successfully" });
-  } catch (error) {
-    console.error("Error registering user:", error);
-    res
-      .status(500)
-      .json({ message: "Something went wrong while registering the user" });
-  }
-});
+      res.status(201).json({ user: existingUser, message: "User upgraded successfully" });
+    } catch (error) {
+      console.error("Error upgrading user:", error);
+      res.status(500).json({ message: "Something went wrong while upgrading the user" });
+    }
+  });
+
 const loginUser = asyncHandler(async (req, res) => {
 
   const { email, password } = req.body;
@@ -490,7 +517,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find();
+  const users = await User.find().select("-password -refreshToken -__v");
   if (!users || users.length === 0) {
     return res.status(404).json(new ApiResponse(404, null, "No users found"));
   }
@@ -848,4 +875,5 @@ export {
   getUserById,
   sendOTP,
   verifyOTP,
+  upgradeUser,
 };
