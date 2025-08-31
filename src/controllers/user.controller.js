@@ -258,73 +258,94 @@ const upgradeUser = asyncHandler(async (req, res) => {
       }
     }
 
-    // Assign user to parent's left or right
-    // if (position === "left") {
-    //   if (!parent.leftChild) {
-    //     parent.leftChild = existingUser._id;
-    //     existingUser.position = position;
-      //   } else if (!parent.rightChild) {
-      //     parent.rightChild = existingUser._id;
-      //     existingUser.position = "right";
-      //   } else {
-      //     let nextParent = await findDeepestAvailable(parent.leftChild, "left");
-      //     if (nextParent) {
-      //       if (!nextParent.leftChild) {
-      //         nextParent.leftChild = existingUser._id;
-      //         existingUser.position = "left";
-      //       } else if (!nextParent.rightChild) {
-      //         nextParent.rightChild = existingUser._id;
-      //         existingUser.position = "right";
-      //       }
-      //       await nextParent.save();
-      //     } else {
-      //       return res.status(409).json({ message: "No available position in left branch" });
-      //     }
-      //   }
-      // }
+    await existingUser.save();
+    await parent.save();
 
-      // else if (position === "right") {
-      //   if (!parent.rightChild) {
-      //     parent.rightChild = existingUser._id;
-      //     existingUser.position = position;
-      //   } else if (!parent.leftChild) {
-      //     parent.leftChild = existingUser._id;
-      //     existingUser.position = "left";
-      //   } else {
-      //     let nextParent = await findDeepestAvailable(parent.rightChild, "right");
-      //     if (nextParent) {
-      //       if (!nextParent.rightChild) {
-      //         nextParent.rightChild = existingUser._id;
-      //         existingUser.position = "right";
-      //       } else if (!nextParent.leftChild) {
-      //         nextParent.leftChild = existingUser._id;
-      //         existingUser.position = "left";
-      //       }
-      //       await nextParent.save();
-      //     } else {
-      //       return res.status(409).json({ message: "No available position in right branch" });
-      //     }
-      //   }
-      // } else {
-      //   return res.status(400).json({ message: "Invalid position value" });
-      // }
+    // Add direct referral
+    await User.findByIdAndUpdate(
+      sponsor._id,
+      { $addToSet: { directReferrals: existingUser._id } },
+      { new: true }
+    );
 
-      await existingUser.save();
-      await parent.save();
+    res.status(201).json({ user: existingUser, message: "User upgraded successfully" });
+  } catch (error) {
+    console.error("Error upgrading user:", error);
+    res.status(500).json({ message: "Something went wrong while upgrading the user" });
+  }
+});
 
-      // Add direct referral
-      await User.findByIdAndUpdate(
-        sponsor._id,
-        { $addToSet: { directReferrals: existingUser._id } },
-        { new: true }
-      );
 
-      res.status(201).json({ user: existingUser, message: "User upgraded successfully" });
-    } catch (error) {
-      console.error("Error upgrading user:", error);
-      res.status(500).json({ message: "Something went wrong while upgrading the user" });
+
+// GET: /api/users/tree/:userId
+const getUserTree = asyncHandler(async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("🌳 Starting to build tree for userId:", userId);
+
+    // Step 1: Find the root user
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log("❌ User not found:", userId);
+      return res.status(404).json({ message: "User not found" });
     }
-  });
+
+    // Step 2: Recursive function to build tree
+    const buildTree = async (id, visited = new Set()) => {
+      if (!id) {
+        console.log("⚠️ No user ID provided, returning null");
+        return null;
+      }
+
+      // Infinite loop protection
+      if (visited.has(id.toString())) {
+        console.log(`⚠️ User ${id} already visited → stopping recursion`);
+        return null;
+      }
+
+      visited.add(id.toString());
+
+      console.log("🔍 Fetching user:", id);
+      const currentUser = await User.findById(id);
+
+      if (!currentUser) {
+        console.log("⚠️ User not found for ID:", id);
+        return null;
+      }
+
+      console.log(`👤 Found user: ${currentUser.name} (${currentUser._id})`);
+
+      // Recursive fetch for left and right child
+      const leftChild = currentUser.leftChild
+        ? await buildTree(currentUser.leftChild, visited)
+        : null;
+
+      const rightChild = currentUser.rightChild
+        ? await buildTree(currentUser.rightChild, visited)
+        : null;
+
+      return {
+        id: currentUser._id,
+        name: currentUser.name,
+        email: currentUser.email,
+        leftChild,
+        rightChild,
+      };
+    };
+
+    // Step 3: Build the tree for the root user
+    const userTree = await buildTree(user._id);
+
+    console.log("✅ Final User Tree Built Successfully");
+    return res.status(200).json({ userTree });
+  } catch (error) {
+    console.error("🔥 Error building user tree:", error);
+    return res.status(500).json({ message: "Internal Server Error", error });
+  }
+});
+
+
+
 
 const loginUser = asyncHandler(async (req, res) => {
 
@@ -876,4 +897,5 @@ export {
   sendOTP,
   verifyOTP,
   upgradeUser,
+  getUserTree
 };
