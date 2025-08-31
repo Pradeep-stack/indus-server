@@ -21,6 +21,7 @@ import {
   sendOTP,
   verifyOTP,
   upgradeUser,
+  getUserTree
 } from "../controllers/user.controller.js";
 import { uploadSingle, uploadMultiple } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -53,5 +54,6 @@ router.route("/history").get(verifyJWT, getWatchHistory)
 
 // MLM routes
 router.route("/upgrade-user").post( upgradeUser)
+router.route("/user-tree/:userId").get( getUserTree)
 
 export default router
