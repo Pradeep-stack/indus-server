@@ -68,6 +68,9 @@ const userSchema = new Schema(
     referral_code: {
       type: String,
     },
+    sponsor_code: {
+      type: String,
+    },
     position: {
       type: String,
       // enum: ["left", "right"],

@@ -32,6 +32,8 @@
     "nanoid": "^5.0.7",
     "puppeteer": "^24.7.2",
     "razorpay": "^2.9.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
     "ytdl-core": "^4.11.5"
   },
