@@ -2,6 +2,11 @@
 import { app } from "./app.js";
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
+import cors from "cors"
+app.use(cors({
+  origin: "*",
+  credentials: true
+}));
 
 const PORT = process.env.PORT || 4000;
 // for env configaration  also add in scripts  "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"

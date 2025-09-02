@@ -1,17 +1,14 @@
 // app.js 
 import express from "express";
 import cookieParser from "cookie-parser";
-import cors from "cors"
+
 import path from 'path';
 import { __dirname } from './utils/dirname.js';
 import ytdl from 'ytdl-core';
 import { swaggerDocs } from "./swagger.js";
 const app = express()
 
-app.use(cors({
-  origin: "*",
-  credentials: true
-}))
+
 app.use(express.json({ limit: "5mb" }))
 app.use(express.urlencoded({ extended: true, limit: "5mb" }))
 app.use(express.static("public"))
