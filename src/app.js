@@ -4,7 +4,7 @@ import cors from "cors";
 import path from "path";
 import { __dirname } from "./utils/dirname.js";
 import ytdl from "ytdl-core";
-import { swaggerDocs } from "./swagger.js";
+// import { swaggerDocs } from "./swagger.js";
 
 const app = express();
 
@@ -72,6 +72,6 @@ app.get("/download", (req, res) => {
 });
 
 // ✅ Initialize Swagger Docs
-swaggerDocs(app);
+// swaggerDocs(app);
 
 export { app };
