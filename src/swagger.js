@@ -15,7 +15,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:4001/", // Change if needed
+        url: "https://api.indusdigicart.com/", // Change if needed
       },
     ],
     components: {
