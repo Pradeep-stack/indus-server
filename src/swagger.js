@@ -15,7 +15,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "https://indus-server.onrender.com/", // Change if needed
+        url: "http://localhost:4001/", // Change if needed
       },
     ],
     components: {
@@ -41,5 +41,5 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 export const swaggerDocs = (app) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  console.log(`📄 Swagger Docs available at https://indus-server.onrender.com/api-docs`);
+  console.log(`📄 Swagger Docs available at http://localhost:4001/api-docs`);
 };
