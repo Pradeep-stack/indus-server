@@ -198,14 +198,12 @@ const upgradeUser = asyncHandler(async (req, res) => {
     }
 
     const existingUser = await User.findById(userId);
+ 
     if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ Ensure user has region before sponsor code generation
-    if (!existingUser.region) {
-      return res.status(400).json({ message: "User must have a region (India/Nepal)" });
-    }
+
 
     // ✅ Assign user_type & Sponsor Code
     let user_type, sponsorCode = null;
@@ -214,17 +212,18 @@ const upgradeUser = asyncHandler(async (req, res) => {
     } else if (packagePlan === "package-2") {
       user_type = "Professional";
       sponsorCode =
-        (existingUser.region.toLowerCase() === "india" ? "IND" : "NP") +
-        Math.floor(1000000 + Math.random() * 9000000);
+        (existingUser.region === "india" ? "IND" : "NP") +
+        Math.floor(100000 + Math.random() * 900000);
     } else if (packagePlan === "package-3") {
       user_type = "Corporate";
       sponsorCode =
-        (existingUser.region.toLowerCase() === "india" ? "IND" : "NP") +
+        (existingUser.region === "india" ? "IND" : "NP") +
         Math.floor(1000000 + Math.random() * 9000000);
     } else {
       return res.status(400).json({ message: "Invalid package plan" });
     }
 
+ 
     existingUser.user_type = user_type;
     if (sponsorCode) existingUser.sponsor_code = sponsorCode;
 
@@ -235,10 +234,14 @@ const upgradeUser = asyncHandler(async (req, res) => {
     }
 
     // ✅ Assign referral/upline if not already set
-    if (!existingUser.referral_by) {
-      existingUser.referral_by = sponsor.sponsor_code;
+    if (!existingUser.referredBy) {
+      // console.log("Upgrading user:", sponsor);
+      existingUser.referredBy = sponsor.referral_code;
     }
-    existingUser.sponsor_by = sponsor._id;
+
+    // console.log("Upgrading user:", existingUser);
+    // return;
+    existingUser.sponsorBy = sponsor.sponsor_code;
 
     // ✅ Tree placement (only Corporate & Professional)
     if (["Professional", "Corporate"].includes(user_type)) {
@@ -287,6 +290,7 @@ const upgradeUser = asyncHandler(async (req, res) => {
       await parent.save();
     }
 
+
     await existingUser.save();
 
     // ✅ Add direct referral
@@ -324,14 +328,12 @@ const getUserTree = async (req, res) => {
       visited.add(id.toString());
 
       const user = await User.findById(id).select(
-        "_id name email leftChild rightChild region position"
+        "_id fullName email sponsor_code  referral_code leftChild rightChild region position"
       );
-
       if (!user) return null;
-
       return {
         _id: user._id,
-        name: user.name,
+        name: user.fullName,
         email: user.email,
         region: user.region,
         sponsor_code: user.sponsor_code,
@@ -542,7 +544,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select("-password -refreshToken -__v");
+  const users = await User.find();
   if (!users || users.length === 0) {
     return res.status(404).json(new ApiResponse(404, null, "No users found"));
   }
@@ -901,5 +903,5 @@ export {
   sendOTP,
   verifyOTP,
   upgradeUser,
-  getUserTree
+  getUserTree,
 };
