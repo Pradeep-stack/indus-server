@@ -76,6 +76,7 @@ const userSchema = new Schema(
       // enum: ["left", "right"],
     },
     referredBy: { type: String },
+    sponsorBy: { type: String },
     leftChild: { type: Schema.Types.ObjectId, ref: "User" },
     rightChild: { type: Schema.Types.ObjectId, ref: "User" },
     directReferrals: [{ type: Schema.Types.ObjectId, ref: "User" }],

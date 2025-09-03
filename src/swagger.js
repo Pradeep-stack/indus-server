@@ -15,7 +15,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "https://api.indusdigicart.com/", // Change if needed
+        url: process.env.DEVELOPMENT || "https://api.indusdigicart.com/", 
       },
     ],
     components: {
